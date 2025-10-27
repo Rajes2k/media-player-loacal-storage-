@@ -1,615 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-<title>Rajes Media Player — Mobile MX-like Web</title>
-<style>
-  /* ---------- Theme variables ---------- */
-  :root{
-    --bg:#0d1117; --panel:#1c1c1c; --accent:#00bcd4; --text:#ffffff; --muted:rgba(255,255,255,.8);
-    --thumb-h:120px;
-  }
-  [data-theme="light"]{
-    --bg:#f3f7fb; --panel:#fff; --accent:#007b88; --text:#0a0a0a; --muted:rgba(0,0,0,.65);
-  }
-  html,body{height:100%; margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;}
-  header{padding:14px 12px 6px; text-align:center;}
-  h1{margin:0; color:var(--accent); font-size:24px;}
-  .controls{display:flex; justify-content:center; gap:8px; margin-top:10px; flex-wrap:wrap;}
-  input[type=file]{display:none;}
-  .btn{background:var(--accent); color:#fff; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:700; border: none;}
-  .theme-toggle{background:transparent; color:var(--accent); border:2px solid var(--accent); padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:700;}
-  .message{font-size:13px; color:var(--muted); margin-top:8px; text-align:center;}
+  <meta charset="UTF-8">
+  <title>🎬 Rajes Media Player</title>
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --text-color: #ffffff;
+      --accent-color: #00bcd4;
+      --card-bg: #1c1c1c;
+      --hover-scale: 1.05;
+    }
 
-  /* gallery */
-  .gallery{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; padding:18px; max-width:1180px; margin:0 auto 14px;}
-  .thumb{position:relative; background:var(--panel); border-radius:10px; overflow:hidden; cursor:pointer; display:flex; flex-direction:column;}
-  .thumb video{width:100%; height:var(--thumb-h); object-fit:cover; display:block; background:#000;}
-  .thumb .meta{padding:8px; display:flex; gap:8px; align-items:center; justify-content:space-between; color:var(--muted); font-size:13px;}
-  .thumb .filename{overflow:hidden; white-space:nowrap; text-overflow:ellipsis; flex:1; padding-right:6px;}
-  .thumb .duration{background:rgba(0,0,0,.45); padding:4px 6px; border-radius:6px; font-weight:700;}
+    body.light {
+      --bg-color: #f3f4f6;
+      --text-color: #111827;
+      --accent-color: #007bff;
+      --card-bg: #ffffff;
+    }
 
-  /* Player overlay */
-  #player-container{display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; justify-content:center; align-items:center; background:rgba(0,0,0,0.9); flex-direction:column;}
-  #player-wrap{position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; overflow:hidden;}
-  #player{max-width:100%; max-height:100%; background:#000; transform-origin:center center; will-change:transform,filter;}
-  #close{position:absolute; top:12px; right:12px; z-index:60; font-size:24px; color:var(--text); background:rgba(0,0,0,.4); padding:8px; border-radius:8px; cursor:pointer;}
-  .controls-overlay{position:absolute; bottom:14px; left:0; right:0; display:flex; justify-content:center; gap:12px; z-index:50; align-items:center; pointer-events:auto;}
-  .oc-btn{background:rgba(0,0,0,.5); color:var(--text); padding:10px 12px; border-radius:10px; border:none; font-weight:700; cursor:pointer;}
-  .oc-select{padding:8px; border-radius:8px; border:none; font-weight:700; background:rgba(0,0,0,.45); color:var(--text);}
-  .big-play{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:48; font-size:48px; color:rgba(255,255,255,.95); background:rgba(0,0,0,.25); padding:18px; border-radius:50%; display:none; cursor:pointer;}
-  .progress-wrap{position:absolute; left:12px; right:12px; bottom:70px; display:flex; gap:10px; align-items:center; z-index:51;}
-  .time{color:var(--muted); font-weight:700; font-size:14px; min-width:48px;}
-  input[type=range].seek{flex:1; appearance:none; height:6px; background:rgba(255,255,255,.12); border-radius:6px; outline:none;}
-  input[type=range].seek::-webkit-slider-thumb{appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); box-shadow:0 2px 0 rgba(0,0,0,.2); cursor:pointer;}
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      transition: background 0.4s, color 0.4s;
+    }
 
-  /* HUD for brightness/volume/preview */
-  .hud{position:absolute; right:12px; top:14px; background:rgba(0,0,0,.5); padding:8px 10px; border-radius:8px; color:var(--text); z-index:70; display:none; font-weight:700;}
-  .kids-lock{position:absolute; left:12px; top:12px; z-index:70; color:var(--text); background:rgba(0,0,0,.35); padding:8px; border-radius:8px; cursor:pointer;}
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+      background: var(--card-bg);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
 
-  /* subtitle area for style and gestures */
-  .subtitle-layer{position:absolute; bottom:24%; left:0; right:0; display:flex; justify-content:center; align-items:center; pointer-events:none; padding:6px 12px; z-index:55;}
-  .subtitle-text{pointer-events:none; font-size:20px; color:#fff; text-shadow: 0 2px 10px rgba(0,0,0,.8); text-align:center; max-width:95%;}
+    h1 {
+      color: var(--accent-color);
+      margin: 0;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-  /* UI for small screens enlarge controls */
-  @media (max-width:600px){
-    .oc-btn{padding:12px 16px; min-width:52px;}
-    .thumb video{height:110px;}
-    .subtitle-text{font-size:18px;}
-  }
+    .theme-toggle {
+      cursor: pointer;
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .theme-toggle:hover {
+      background: #0095a8;
+    }
 
-  /* aspect & fit helpers */
-  .fit-cover{object-fit:cover;}
-  .fit-contain{object-fit:contain;}
-  .fit-fill{object-fit:fill;}
-</style>
+    .controls {
+      margin: 25px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    label {
+      background: var(--accent-color);
+      color: white;
+      padding: 12px 25px;
+      margin: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    label:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px var(--accent-color);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .thumb {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--card-bg);
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .thumb:hover {
+      transform: scale(var(--hover-scale));
+      box-shadow: 0 0 15px var(--accent-color);
+    }
+
+    .thumb video {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb span {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(0,0,0,0.7);
+      padding: 3px 6px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+
+    .file-name {
+      font-size: 14px;
+      padding: 8px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      color: var(--text-color);
+    }
+
+    footer {
+      margin-top: 30px;
+      padding: 10px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    #player-container {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    #player {
+      width: 95%;
+      height: auto;
+      max-height: 95%;
+    }
+
+    #close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 25px;
+      cursor: pointer;
+      color: white;
+    }
+  </style>
 </head>
-<body data-theme="dark">
+<body>
   <header>
     <h1>🎬 Rajes Media Player</h1>
-    <div class="controls">
-      <label class="btn" for="fileInput">🎞️ Select Files</label>
-      <input id="fileInput" type="file" accept="video/*" multiple>
-
-      <label class="btn" for="folderInput">📁 Select Folder</label>
-      <input id="folderInput" type="file" accept="video/*" webkitdirectory>
-
-      <button id="themeBtn" class="theme-toggle">🌗 Theme</button>
-    </div>
-    <div class="message">Mobile gestures: swipe left/right to change, vertical left brightness / right volume, pinch to zoom, tap to play/pause, double-tap to skip.</div>
+    <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
   </header>
 
-  <main>
-    <div class="gallery" id="gallery"></div>
-  </main>
+  <div class="controls">
+    <label for="fileInput">🎞️ Select Files</label>
+    <input type="file" id="fileInput" accept="video/*" multiple>
 
-  <!-- Player overlay -->
-  <div id="player-container" role="dialog" aria-hidden="true">
-    <div id="player-wrap">
-      <button id="close" title="Close">✖</button>
-      <button id="kidsLockBtn" class="kids-lock" title="Kids Lock">🔓</button>
-
-      <video id="player" playsinline webkit-playsinline controls crossorigin="anonymous"></video>
-
-      <div class="subtitle-layer" id="subtitle-layer" aria-hidden="true">
-        <div id="subtitle" class="subtitle-text"></div>
-      </div>
-
-      <div class="big-play" id="bigPlay">▶</div>
-
-      <div class="hud" id="hud">HUD</div>
-
-      <div style="position:absolute;bottom:10px;left:12px;right:12px;display:flex;flex-direction:column;gap:10px;pointer-events:auto;">
-        <div class="progress-wrap">
-          <div class="time" id="curTime">00:00</div>
-          <input type="range" class="seek" id="seek" min="0" max="100" value="0" step="0.1" />
-          <div class="time" id="durTime">00:00</div>
-        </div>
-
-        <div class="controls-overlay" id="controlsOverlay">
-          <button class="oc-btn" id="prevBtn">⟸</button>
-          <button class="oc-btn" id="playBtn">▶/▮▮</button>
-          <button class="oc-btn" id="nextBtn">⟹</button>
-
-          <select id="audioSelect" class="oc-select" style="display:none"></select>
-          <select id="subtitleSelect" class="oc-select" title="Subtitles">
-            <option value="">Subtitles</option>
-          </select>
-
-          <button id="aspectBtn" class="oc-btn" title="Aspect">AR</button>
-          <button id="lockBtn" class="oc-btn" title="Alternative Lock">🔒</button>
-        </div>
-      </div>
-    </div>
+    <label for="folderInput">📁 Select Folder</label>
+    <input type="file" id="folderInput" accept="video/*" webkitdirectory>
   </div>
 
-<script>
-/* -------------- Global state -------------- */
-const gallery = document.getElementById('gallery');
-const fileInput = document.getElementById('fileInput');
-const folderInput = document.getElementById('folderInput');
-const themeBtn = document.getElementById('themeBtn');
+  <div class="gallery" id="gallery"></div>
 
-const playerContainer = document.getElementById('player-container');
-const playerWrap = document.getElementById('player-wrap');
-const player = document.getElementById('player');
-const closeBtn = document.getElementById('close');
-const bigPlay = document.getElementById('bigPlay');
-const hud = document.getElementById('hud');
-const curTime = document.getElementById('curTime');
-const durTime = document.getElementById('durTime');
-const seek = document.getElementById('seek');
-const playBtn = document.getElementById('playBtn');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const audioSelect = document.getElementById('audioSelect');
-const subtitleSelect = document.getElementById('subtitleSelect');
-const subtitleLayer = document.getElementById('subtitle-layer');
-const subtitleText = document.getElementById('subtitle');
-const aspectBtn = document.getElementById('aspectBtn');
-const lockBtn = document.getElementById('lockBtn');
-const kidsLockBtn = document.getElementById('kidsLockBtn');
+  <div id="player-container">
+    <span id="close">✖</span>
+    <video id="player" controls autoplay></video>
+  </div>
 
-let files = [];                 // FileList array
-let currentIndex = -1;
-let playerURL = null;
-let brightness = 1.0;
-let zoom = 1.0;
-let panX = 0, panY = 0;
-let isLocked = false;
-let isKidsLocked = false;
-let subtitleTracks = [];        // {label, cues, vtturl}
-let currentSubtitleIndex = -1;
-let aspectModes = ['contain','cover','fill']; let aspectIdx = 0;
+  <footer>© 2025 Rajes Media Player | Built with ❤️ using Flask</footer>
 
-/* -------------- Helpers -------------- */
-function formatTime(s){
-  s = Number(s) || 0;
-  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.floor(s%60);
-  return h>0? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`: `${m}:${String(sec).padStart(2,'0')}`;
-}
-function showHUD(msg, ms=900){
-  hud.style.display='block'; hud.textContent = msg;
-  clearTimeout(hud.h);
-  hud.h = setTimeout(()=>hud.style.display='none', ms);
-}
-function revokeURL(url){
-  try{ if(url) URL.revokeObjectURL(url); }catch(e){}
-}
+  <script>
+    const gallery = document.getElementById('gallery');
+    const playerContainer = document.getElementById('player-container');
+    const player = document.getElementById('player');
+    const closeBtn = document.getElementById('close');
+    const themeToggle = document.getElementById('themeToggle');
 
-/* -------------- Gallery & thumbnails (original behavior preserved) -------------- */
-function createThumb(file, idx){
-  const url = URL.createObjectURL(file);
-  const div = document.createElement('div'); div.className='thumb'; div.dataset.idx = idx;
-  const v = document.createElement('video'); v.src=url; v.muted=true; v.preload='metadata'; v.playsInline=true; v.setAttribute('webkit-playsinline','');
-  const meta = document.createElement('div'); meta.className='meta';
-  const name = document.createElement('div'); name.className='filename'; name.textContent=file.name;
-  const dur = document.createElement('div'); dur.className='duration'; dur.textContent='...';
-  v.addEventListener('loadedmetadata', ()=>{ dur.textContent = formatTime(Math.floor(v.duration)); });
-  div.appendChild(v); meta.appendChild(name); meta.appendChild(dur); div.appendChild(meta);
-  div.addEventListener('click', ()=>openPlayer(idx));
-  return {div,url};
-}
-function showGallery(fileList){
-  // cleanup existing urls
-  document.querySelectorAll('.thumb video').forEach(t => { try{ URL.revokeObjectURL(t.src);}catch(e){}});
-  gallery.innerHTML=''; files = Array.from(fileList || []);
-  files.forEach((f, i)=>{ if(!f.type.startsWith('video/')) return; const {div} = createThumb(f,i); gallery.appendChild(div); });
-}
+    // Theme Toggle
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      const isLight = document.body.classList.contains('light');
+      themeToggle.textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
+    });
 
-/* -------------- Player open/close -------------- */
-function openPlayer(idx){
-  if(idx<0 || !files[idx]) return;
-  currentIndex = idx;
-  const f = files[idx];
-  revokeURL(playerURL);
-  playerURL = URL.createObjectURL(f);
-  player.src = playerURL;
-  playerContainer.style.display='flex';
-  playerContainer.setAttribute('aria-hidden','false');
-  resetVisuals();
-  subtitleTracks = []; subtitleSelect.innerHTML = '<option value="">Subtitles</option>'; currentSubtitleIndex=-1;
-  // load default text tracks if any embedded - we try to read tracks once loaded
-  player.addEventListener('loadedmetadata', onMetaLoaded, {once:true});
-  player.play().catch(()=>{ /* autoplay may be blocked until user interacts */});
-  updateNavButtons();
-}
-function closePlayer(){
-  player.pause();
-  player.removeAttribute('src');
-  player.load();
-  playerContainer.style.display='none';
-  playerContainer.setAttribute('aria-hidden','true');
-  revokeURL(playerURL);
-  playerURL = null;
-  currentIndex = -1;
-  resetVisuals();
-}
-closeBtn.addEventListener('click', closePlayer);
+    closeBtn.onclick = () => {
+      player.pause();
+      playerContainer.style.display = 'none';
+      player.src = '';
+    };
 
-/* -------------- Metadata & UI sync -------------- */
-function onMetaLoaded(){
-  seek.max = player.duration || 0;
-  durTime.textContent = formatTime(player.duration);
-  // try detect audio tracks (browser dependent)
-  populateAudioTracks();
-  // resume subtitle if present
-  player.addEventListener('timeupdate', syncUI);
-  // if visibility hidden allow background play but don't pause
-  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) { /*browser handles background playback*/ }});
-}
-function syncUI(){
-  seek.value = player.currentTime;
-  curTime.textContent = formatTime(player.currentTime);
-  renderSubtitleAt(player.currentTime);
-}
-seek.addEventListener('input', ()=>{ curTime.textContent = formatTime(seek.value); showPreview(seek.value); });
-seek.addEventListener('change', ()=>{ // change applies
-  player.currentTime = Number(seek.value);
-});
+    function showVideos(files) {
+      gallery.innerHTML = '';
+      [...files].forEach(file => {
+        if (!file.type.startsWith('video/')) return;
 
-/* -------------- Play / Pause / Prev / Next -------------- */
-playBtn.addEventListener('click', ()=>{ if(player.paused) player.play(); else player.pause(); updatePlayBtn();});
-player.addEventListener('play', ()=>{ updatePlayBtn(); bigPlay.style.display='none'; });
-player.addEventListener('pause', ()=>{ updatePlayBtn(); bigPlay.style.display='block'; });
-bigPlay.addEventListener('click', ()=>{ if(player.paused) player.play(); else player.pause();});
-function updatePlayBtn(){ playBtn.textContent = player.paused ? '▶' : '▮▮'; }
-prevBtn.addEventListener('click', ()=>{ if(files.length>1){ currentIndex = (currentIndex-1 + files.length) % files.length; openPlayer(currentIndex); }});
-nextBtn.addEventListener('click', ()=>{ if(files.length>1){ currentIndex = (currentIndex+1) % files.length; openPlayer(currentIndex); }});
-function updateNavButtons(){ prevBtn.disabled = files.length<=1; nextBtn.disabled = files.length<=1; }
+        const url = URL.createObjectURL(file);
+        const div = document.createElement('div');
+        div.className = 'thumb';
 
-/* -------------- Audio tracks (browser-limited) -------------- */
-function populateAudioTracks(){
-  audioSelect.style.display='none'; audioSelect.innerHTML='';
-  const at = player.audioTracks;
-  if(at && at.length>0){
-    for(let i=0;i<at.length;i++){
-      const opt=document.createElement('option'); opt.value=i; opt.textContent = at[i].label||at[i].language||('Audio '+(i+1));
-      audioSelect.appendChild(opt);
+        const video = document.createElement('video');
+        video.src = url;
+        video.muted = true;
+        video.preload = 'metadata';
+
+        video.addEventListener('loadedmetadata', () => {
+          const duration = Math.floor(video.duration);
+          const mins = Math.floor(duration / 60);
+          const secs = duration % 60;
+          const label = document.createElement('span');
+          label.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+          div.appendChild(label);
+        });
+
+        // Show file name
+        const fileName = document.createElement('div');
+        fileName.className = 'file-name';
+        fileName.textContent = file.name;
+
+        div.onclick = () => {
+          player.src = url;
+          playerContainer.style.display = 'flex';
+          player.play();
+        };
+
+        div.appendChild(video);
+        gallery.appendChild(div);
+        gallery.appendChild(fileName);
+      });
     }
-    audioSelect.style.display='inline-block';
-    audioSelect.addEventListener('change', ()=>{ for(let i=0;i<at.length;i++) at[i].enabled = (i==audioSelect.value); });
-  }
-}
 
-/* -------------- Subtitles support (SRT->VTT convert) -------------- */
-function srtToVtt(srt){
-  // naive convert: prefix VTT header and convert comma to dot in timestamps
-  const vtt = 'WEBVTT\n\n' + srt.replace(/\r+/g,'').split('\n').map(line=>{
-    return line.replace(/(\d+:\d+:\d+),(\d+)/g, '$1.$2');
-  }).join('\n');
-  return vtt;
-}
-function addSubtitleFromFile(file){
-  const reader = new FileReader();
-  reader.onload = ()=> {
-    let content = reader.result;
-    if(file.name.toLowerCase().endsWith('.srt')) content = srtToVtt(content);
-    // create blob url
-    const blob = new Blob([content], {type:'text/vtt'});
-    const url = URL.createObjectURL(blob);
-    subtitleTracks.push({label:file.name, url, content});
-    const opt = document.createElement('option'); opt.value = subtitleTracks.length-1; opt.textContent = file.name;
-    subtitleSelect.appendChild(opt);
-  };
-  reader.readAsText(file);
-}
-subtitleSelect.addEventListener('change', ()=>{
-  const idx = subtitleSelect.value;
-  if(idx === ''){ removeAllCues(); currentSubtitleIndex = -1; return; }
-  applySubtitleTrack(Number(idx));
-});
-function removeAllCues(){
-  // remove existing tracks
-  const tracks = player.textTracks;
-  for(let i=tracks.length-1;i>=0;i--) tracks[i].mode='disabled';
-  subtitleText.textContent=''; subtitleLayer.style.display='none';
-}
-function applySubtitleTrack(idx){
-  removeAllCues(); currentSubtitleIndex = idx;
-  const t = subtitleTracks[idx];
-  if(!t) return;
-  // Create track element
-  let trackEl = document.createElement('track');
-  trackEl.kind = 'subtitles'; trackEl.label = t.label; trackEl.src = t.url; trackEl.default = true;
-  player.appendChild(trackEl);
-  // enable once loaded
-  trackEl.addEventListener('load', ()=>{ trackEl.mode='showing'; subtitleLayer.style.display='flex'; renderCueList(trackEl); }, {once:true});
-  // fallback: if already loaded by browser, set showing
-  setTimeout(()=>{ try{ trackEl.mode='showing'; subtitleLayer.style.display='flex'; } catch(e){} }, 700);
-}
-function renderCueList(trackEl){
-  // nothing heavy: we will read player.textTracks for cues
-  // on cuechange we render the current cue
-  const tlist = player.textTracks;
-  for(let i=0;i<tlist.length;i++){
-    const tt = tlist[i];
-    tt.mode='hidden';
-    tt.addEventListener('cuechange', ()=>{ renderSubtitleAt(player.currentTime); }, {passive:true});
-  }
-}
-function renderSubtitleAt(time){
-  const tlist = player.textTracks;
-  for(let i=0;i<tlist.length;i++){
-    const tt = tlist[i];
-    if(tt.mode === 'showing' || tt.mode === 'hidden'){
-      for(let c=0;c<tt.cues.length;c++){
-        const cue = tt.cues[c];
-        if(time >= cue.startTime && time <= cue.endTime){
-          subtitleText.style.fontSize = window.getComputedStyle(subtitleText).fontSize; // keep
-          subtitleText.textContent = cue.text;
-          subtitleLayer.style.display = 'flex';
-          return;
-        }
-      }
-    }
-  }
-  subtitleText.textContent=''; subtitleLayer.style.display = 'none';
-}
+    document.getElementById('fileInput').addEventListener('change', e => {
+      showVideos(e.target.files);
+    });
 
-/* allow user to upload subtitle files via context menu or drag/drop onto player */
-document.addEventListener('dragover',(e)=>e.preventDefault());
-document.addEventListener('drop',(e)=>{ e.preventDefault(); if(e.dataTransfer && e.dataTransfer.files.length){ Array.from(e.dataTransfer.files).forEach(f=>{ if(f.type.includes('text')||f.name.match(/\.(srt|vtt|ass|ssa|sub)$/i)) addSubtitleFromFile(f); }); }});
-
-/* -------------- Seek preview (naive frame capture) -------------- */
-const previewCanvas = document.createElement('canvas'); const previewCtx = previewCanvas.getContext('2d');
-let previewTimeout = null;
-function showPreview(targetTime){
-  // Capture current frame at targetTime by briefly seeking (warning: may cause hiccup on slow videos)
-  clearTimeout(previewTimeout);
-  const oldTime = player.currentTime; const oldPaused = player.paused;
-  // best-effort: pause, seek, draw, restore
-  try{
-    player.pause();
-    player.currentTime = targetTime;
-    previewTimeout = setTimeout(()=>{ // wait small time for frame to be available
-      try{
-        previewCanvas.width = Math.min(240, player.videoWidth||320);
-        previewCanvas.height = previewCanvas.width * ((player.videoHeight||180)/(player.videoWidth||320) || 9/16);
-        previewCtx.drawImage(player, 0, 0, previewCanvas.width, previewCanvas.height);
-        // show a small floating preview near scrubber thumb
-        showFloatingPreview(previewCanvas.toDataURL());
-      }catch(e){}
-      // restore state
-      if(!oldPaused) player.play();
-      player.currentTime = oldTime;
-    }, 160);
-  }catch(e){
-    // fallback: just show time HUD
-    showHUD(formatTime(targetTime), 600);
-  }
-}
-function showFloatingPreview(dataUrl){
-  // create small image popup near center-bottom
-  let img = document.getElementById('preview-img');
-  if(!img){
-    img = document.createElement('img'); img.id='preview-img';
-    img.style.position='absolute'; img.style.bottom='120px'; img.style.left='50%'; img.style.transform='translateX(-50%)'; img.style.width='160px'; img.style.borderRadius='8px'; img.style.zIndex=80; img.style.boxShadow='0 6px 18px rgba(0,0,0,.6)';
-    playerWrap.appendChild(img);
-  }
-  img.src = dataUrl;
-  img.style.display='block';
-  clearTimeout(img._t); img._t = setTimeout(()=>{ img.style.display='none'; }, 900);
-}
-
-/* -------------- Gestures (mobile) -------------- */
-let tStartX=0, tStartY=0, touchMoved=false, tStartTime=0, lastTap=0, activeTouches = [];
-playerContainer.addEventListener('touchstart', e=>{
-  if(isLocked) return;
-  if(e.touches.length===1){
-    const t = e.touches[0];
-    tStartX = t.clientX; tStartY = t.clientY; touchMoved=false; tStartTime = Date.now();
-  }
-  if(e.touches.length>1){
-    activeTouches = [...e.touches];
-  }
-}, {passive:true});
-
-playerContainer.addEventListener('touchmove', e=>{
-  if(isLocked) return;
-  if(e.touches.length===1){
-    touchMoved = true;
-    const t = e.touches[0]; const dx = t.clientX - tStartX; const dy = t.clientY - tStartY;
-    // if vertical dominant, volume/brightness
-    if(Math.abs(dy) > Math.abs(dx)){
-      const half = (tStartX < (player.getBoundingClientRect().left + player.clientWidth/2)) ? 'left' : 'right';
-      const delta = -dy / 250; // sensitivity
-      if(half === 'right'){
-        let nv = Math.max(0, Math.min(1, player.volume + delta));
-        player.volume = nv;
-        showHUD('🔊 ' + Math.round(player.volume*100) + '%');
-      } else {
-        brightness = Math.max(0.2, Math.min(2.0, brightness + delta));
-        player.style.filter = `brightness(${brightness})`;
-        showHUD('🔆 ' + Math.round(brightness*100) + '%');
-      }
-      tStartY = t.clientY;
-    } else {
-      // horizontal => show seeking preview but do not change time until end unless large swipe
-      // active dx used at touchend
-    }
-  } else if(e.touches.length===2){
-    // pinch to zoom
-    const a = e.touches[0], b = e.touches[1];
-    const dist = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-    if(!player._pinchStartDist){ player._pinchStartDist = dist; player._pinchStartZoom = zoom; }
-    const ratio = dist / player._pinchStartDist;
-    zoom = Math.max(1, Math.min(3, player._pinchStartZoom * ratio));
-    applyTransform();
-    showHUD('🔍 x' + zoom.toFixed(2));
-  }
-}, {passive:true});
-
-playerContainer.addEventListener('touchend', e=>{
-  if(isLocked) return;
-  const elapsed = Date.now() - tStartTime;
-  if(!touchMoved && elapsed < 300){
-    const now = Date.now();
-    if(now - lastTap < 350){
-      // double tap -> skip 10s forward
-      player.currentTime = Math.min(player.duration || Infinity, player.currentTime + 10);
-      showHUD('⏩ 10s');
-      lastTap = 0;
-    } else {
-      lastTap = now;
-      // single tap toggles play/pause
-      if(player.paused) player.play(); else player.pause();
-    }
-  }
-  if(touchMoved){
-    // detect horizontal swipe
-    const changed = e.changedTouches[0];
-    const dx = changed.clientX - tStartX;
-    if(Math.abs(dx) > 60){
-      if(dx < 0){ // swipe left -> next
-        if(files.length>1) { currentIndex = (currentIndex+1)%files.length; openPlayer(currentIndex); showHUD('Next'); }
-      } else { // right -> prev
-        if(files.length>1) { currentIndex = (currentIndex-1+files.length)%files.length; openPlayer(currentIndex); showHUD('Prev'); }
-      }
-    }
-  }
-  // reset pinch values
-  player._pinchStartDist = null;
-}, {passive:true});
-
-/* apply zoom + pan */
-function applyTransform(){
-  player.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
-}
-
-/* add pointer events for pan when zoomed (mobile + desktop) */
-let isPanning=false, panStartX=0, panStartY=0;
-player.addEventListener('pointerdown', e=>{
-  if(isLocked) return;
-  if(zoom>1.01){
-    isPanning = true; panStartX = e.clientX; panStartY = e.clientY;
-    player.setPointerCapture(e.pointerId);
-  }
-});
-player.addEventListener('pointermove', e=>{
-  if(!isPanning) return;
-  const dx = (e.clientX - panStartX) / zoom * 1.0;
-  const dy = (e.clientY - panStartY) / zoom * 1.0;
-  panX += dx; panY += dy;
-  panStartX = e.clientX; panStartY = e.clientY;
-  applyTransform();
-});
-player.addEventListener('pointerup', e=>{ if(isPanning){ isPanning=false; try{ player.releasePointerCapture(e.pointerId);}catch(_){} }});
-player.addEventListener('pointercancel', ()=>{ isPanning=false; });
-
-/* -------------- Subtitle gesture controls (position & size) -------------- */
-let subStartY=0, subStartSize=0, subMoving=false;
-subtitleLayer.addEventListener('touchstart', e=>{
-  if(isLocked) return;
-  if(e.touches.length===1){ subStartY = e.touches[0].clientY; subMoving=true; }
-  if(e.touches.length===2){ subStartSize = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); subMoving=true; }
-}, {passive:true});
-subtitleLayer.addEventListener('touchmove', e=>{
-  if(isLocked || !subMoving) return;
-  if(e.touches.length===1){
-    const dy = e.touches[0].clientY - subStartY;
-    // move subtitle up/down by percentage
-    const wrapHeight = player.clientHeight || window.innerHeight;
-    const pct = (dy / wrapHeight) * 100;
-    subtitleLayer.style.bottom = `${24 - pct}%`;
-    subStartY = e.touches[0].clientY;
-  }
-  if(e.touches.length===2){
-    const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    const delta = (dist - subStartSize)/50;
-    const curSize = parseFloat(window.getComputedStyle(subtitleText).fontSize || 20);
-    subtitleText.style.fontSize = Math.max(10, Math.min(80, curSize + delta)) + 'px';
-    subStartSize = dist;
-  }
-}, {passive:true});
-subtitleLayer.addEventListener('touchend', ()=>{ subMoving=false; });
-
-/* -------------- Aspect ratio toggle -------------- */
-aspectBtn.addEventListener('click', ()=>{
-  aspectIdx = (aspectIdx + 1) % aspectModes.length;
-  const mode = aspectModes[aspectIdx];
-  if(mode === 'contain'){ player.classList.remove('fit-cover'); player.classList.remove('fit-fill'); player.classList.add('fit-contain'); showHUD('Aspect: contain'); }
-  else if(mode === 'cover'){ player.classList.remove('fit-contain'); player.classList.remove('fit-fill'); player.classList.add('fit-cover'); showHUD('Aspect: cover'); }
-  else { player.classList.remove('fit-contain'); player.classList.remove('fit-cover'); player.classList.add('fit-fill'); showHUD('Aspect: fill'); }
-});
-
-/* -------------- Lock behavior (alternative & kids lock) -------------- */
-lockBtn.addEventListener('click', ()=>{ isLocked = !isLocked; lockBtn.textContent = isLocked? '🔓':'🔒'; showHUD(isLocked?'UI Locked':'UI Unlocked'); });
-kidsLockBtn.addEventListener('click', ()=>{ isKidsLocked = !isKidsLocked; kidsLockBtn.textContent = isKidsLocked? '🔒':'🔓'; toggleKidsLock(isKidsLocked); });
-function toggleKidsLock(on){
-  if(on){
-    // hide controls and disable clicks except unlock
-    document.getElementById('controlsOverlay').style.display='none';
-    seek.style.display='none';
-    closeBtn.style.display='none';
-    subtitleLayer.style.display='none';
-    // show a simple overlay lock (we'll show kidsLockBtn as unlock)
-    showHUD('Kids Lock enabled');
-  } else {
-    document.getElementById('controlsOverlay').style.display='flex';
-    seek.style.display='block';
-    closeBtn.style.display='block';
-    subtitleLayer.style.display = subtitleText.textContent? 'flex' : 'none';
-    showHUD('Kids Lock disabled');
-  }
-}
-
-/* -------------- Background play handling (best effort) -------------- */
-document.addEventListener('visibilitychange', ()=> {
-  // browsers usually allow media to continue if user has interacted.
-  // we keep playing by doing nothing; optionally show HUD
-  if(document.hidden) { showHUD('Background play'); } else { showHUD('Resumed'); }
-});
-
-/* -------------- Keyboard shortcuts for desktop debug -------------- */
-window.addEventListener('keydown', e=>{
-  if(playerContainer.style.display!=='flex') return;
-  if(e.key==='ArrowRight') player.currentTime = Math.min(player.duration||Infinity, player.currentTime+10);
-  if(e.key==='ArrowLeft') player.currentTime = Math.max(0, player.currentTime-10);
-  if(e.key===' ') { e.preventDefault(); if(player.paused) player.play(); else player.pause(); }
-  if(e.key==='Escape') closePlayer();
-});
-
-/* -------------- File inputs -------------- */
-fileInput.addEventListener('change', (e)=> showGallery(e.target.files));
-folderInput.addEventListener('change', (e)=> showGallery(e.target.files));
-
-/* -------------- Subtitle file upload helper UI (via input) -------------- */
-const subFileInput = document.createElement('input');
-subFileInput.type='file'; subFileInput.accept='.srt,.vtt,.ass,.ssa,.sub,text/*';
-subFileInput.style.display='none';
-document.body.appendChild(subFileInput);
-const addSubBtn = document.createElement('button'); addSubBtn.className='oc-btn'; addSubBtn.textContent='Add Sub'; addSubBtn.style.display='none';
-document.querySelector('.controls').appendChild(addSubBtn);
-addSubBtn.addEventListener('click', ()=>subFileInput.click());
-subFileInput.addEventListener('change', ()=>{ Array.from(subFileInput.files).forEach(f=>addSubtitleFromFile(f)); });
-
-/* -------------- Expose subtitle controls for user via subtitleSelect context menu -------------- */
-subtitleSelect.addEventListener('contextmenu', e=>{ e.preventDefault(); addSubBtn.click(); });
-
-/* -------------- Preserve original features: createObjectURL, thumbnails... -------------- */
-/* Already preserved: gallery thumbnails built with video previews, file/folder inputs, click to open via openPlayer() */
-
-/* -------------- Additional notes on hardware acceleration & multi-core -------------- */
-/*
- - Real HW+ decoder / multi-core decoding are managed by the browser and OS. We cannot force them from JavaScript.
- - We instruct video to use 'playsinline' and rely on browser optimized decoders.
- - For server-side HLS/FFmpeg transforms use, we can provide a separate flow (ask me later).
-*/
-
-/* -------------- Initial small setup ---------- */
-(function init(){
-  // Keep original style: show demo message
-  updatePlayBtn();
-  showHUD('Player ready', 1200);
-  // Option to add small "Add subtitle" visible
-  addSubBtn.style.display='inline-block';
-})();
-
-/* -------------- Prevent deletion of existing server logic ---------- */
-/* This is all client-side index.html only. Keep your Flask app.py unchanged. */
-
-</script>
+    document.getElementById('folderInput').addEventListener('change', e => {
+      showVideos(e.target.files);
+    });
+  </script>
 </body>
 </html>
