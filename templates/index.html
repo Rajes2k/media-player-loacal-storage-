@@ -8,57 +8,45 @@
   :root{
     --bg-dark:#0b0f12;
     --panel-dark:#14181b;
-    --muted-dark:rgba(255,255,255,0.75);
+    --muted-dark:rgba(255,255,255,0.85);
     --accent:#00bcd4;
-    --card-shadow: 0 6px 20px rgba(0,0,0,0.5);
-
+    --card-shadow: 0 6px 20px rgba(0,0,0,0.45);
+    --watched-red: #ea4335;
     --bg-light:#f6f7f9;
     --panel-light:#ffffff;
-    --muted-light:rgba(0,0,0,0.7);
+    --muted-light:rgba(0,0,0,0.8);
   }
 
-  /* base */
   html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Arial, sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{background:var(--bg-dark);color:var(--muted-dark);transition:background .25s,color .25s}
   body.light{background:var(--bg-light);color:var(--muted-light)}
 
-  header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--panel-dark);box-shadow:var(--card-shadow)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--panel-dark);box-shadow:var(--card-shadow);position:sticky;top:0;z-index:10}
   body.light header{background:var(--panel-light)}
   h1{margin:0;color:var(--accent);font-size:18px;display:flex;align-items:center;gap:8px}
   .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-  /* controls */
-  .btn {
-    background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700;
-    display:inline-flex; align-items:center; gap:8px;
-  }
-  .btn.ghost { background:transparent; border:2px solid var(--accent); color:var(--accent); font-weight:700; padding:6px 10px; }
-
+  .btn { background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; display:inline-flex; align-items:center; gap:8px;}
+  .btn.ghost { background:transparent; border:2px solid var(--accent); color:var(--accent); padding:6px 10px; }
   input[type="file"]{display:none;}
 
-  /* indicator badges (emoji) */
   .indicator{display:inline-flex;align-items:center;gap:8px;font-weight:700;padding:6px 8px;border-radius:8px;background:transparent;border:2px solid transparent}
   .indicator .icon{font-size:18px}
 
-  /* layout */
-  .controls-row{padding:14px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+  .controls-row{padding:12px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
   .controls-left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .controls-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-  /* gallery grid */
   .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:18px;max-width:1200px;margin:0 auto}
   .gallery.list{display:flex;flex-direction:column;gap:10px;padding:10px 18px}
 
-  .card{
-    background:var(--panel-dark);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column;
-  }
+  .card{background:var(--panel-dark);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column;position:relative;}
   body.light .card{background:var(--panel-light);box-shadow:0 6px 18px rgba(0,0,0,0.06)}
   .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.35)}
 
-  /* list style card: row */
   .card.row{flex-direction:row;align-items:center;padding:8px;height:110px}
-  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:10px}
-  .thumb{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:10px;background:#000}
+  .thumb{width:100%;height:100%;object-fit:cover;display:block}
   .duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}
 
   .meta{padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1}
@@ -71,24 +59,23 @@
   .meta .detail-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted-dark)}
   body.light .meta .detail-row{color:var(--muted-light)}
 
-  /* small animations */
+  /* watched progress bar under thumbnail (red line) */
+  .watched-bar-wrap{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.08)}
+  .watched-bar{height:100%;width:0%;background:var(--watched-red);transition:width .25s linear}
+
   .pulse { animation: pulse 1.6s infinite; }
   @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
 
-  /* player overlay */
-  #player-container{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center}
-  #player-box{width:95%;max-width:1100px;max-height:92%;display:flex;flex-direction:column;align-items:center;gap:12px}
+  #player-container{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:16px}
+  #player-box{width:100%;max-width:1100px;max-height:92%;display:flex;flex-direction:column;align-items:center;gap:8px}
   #player{width:100%;height:auto;background:#000;border-radius:8px;outline:none}
   #audioPlayer{width:100%;display:none}
   #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}
 
-  /* footer */
-  footer{padding:12px;text-align:center;color:rgba(255,255,255,0.5)}
+  footer{padding:12px;text-align:center;color:rgba(255,255,255,0.45)}
 
-  /* responsive/list adjustments */
   @media (max-width:700px){
     .thumb-wrap{flex:0 0 120px;height:72px;margin:8px}
-    .card.row{height:auto;padding:8px}
     .meta h3{font-size:14px}
     .gallery{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
   }
@@ -118,12 +105,11 @@
       </select>
 
       <select id="sortSelect" class="btn ghost" title="Sort">
-        <option value="type">Sort: Type</option>
+        <option value="type">Type</option>
         <option value="title">Title</option>
         <option value="date">Date</option>
         <option value="length">Length</option>
         <option value="size">Size</option>
-        <option value="resolution">Resolution</option>
       </select>
     </div>
 
@@ -137,7 +123,7 @@
     <div id="gallery" class="gallery"></div>
   </main>
 
-  <div id="player-container">
+  <div id="player-container" role="dialog" aria-hidden="true">
     <div id="player-box">
       <button id="close" title="Close">✖</button>
       <video id="player" controls playsinline webkit-playsinline></video>
@@ -146,7 +132,7 @@
     </div>
   </div>
 
-  <footer>© 2025 Rajes Media Player — All features intact</footer>
+  <footer>© 2025 Rajes Media Player — Your local media, remembered</footer>
 
 <script>
 /* ---------- State ---------- */
@@ -166,11 +152,30 @@ const audioPlayer = document.getElementById('audioPlayer');
 const closeBtn = document.getElementById('close');
 const playerMeta = document.getElementById('player-meta');
 
-let allFiles = []; // objects: {file, url, metadata, thumbUrl, played}
+let allFiles = []; // {file, url, metadata:{duration,width,height,size,date,fps}, thumbUrl, playedSeconds}
 let isListView = false;
 let isLight = false;
 
-/* ---------- Utilities ---------- */
+/* ---------- LocalStorage helpers for last-played positions ---------- */
+function fileKey(file){
+  // stable fingerprint: name|size|lastModified
+  return `${file.name}|${file.size}|${file.lastModified}`;
+}
+function savePlayedPosition(file, seconds){
+  try{
+    const key = 'rmp_play_' + fileKey(file);
+    localStorage.setItem(key, String(seconds || 0));
+  }catch(e){}
+}
+function loadPlayedPosition(file){
+  try{
+    const key = 'rmp_play_' + fileKey(file);
+    const v = localStorage.getItem(key);
+    return v ? Number(v) : 0;
+  }catch(e){ return 0; }
+}
+
+/* ---------- Utils ---------- */
 function formatBytes(bytes){
   if(bytes === 0) return '0 B';
   const k = 1024, sizes = ['B','KB','MB','GB','TB'];
@@ -195,72 +200,57 @@ async function captureThumbnail(url){
     v.preload = 'metadata';
     v.src = url;
 
-    // fallback canvas in case of errors
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
     let resolved = false;
     const cleanup = ()=>{ try{ v.src=''; v.load(); }catch(e){} };
 
-    v.addEventListener('loadedmetadata', async () => {
+    v.addEventListener('loadedmetadata', () => {
       const t = Math.max(0.1, (v.duration || 0) * 0.25);
-      // set size for canvas
       canvas.width = Math.min(480, v.videoWidth || 480);
       canvas.height = Math.round(canvas.width * ((v.videoHeight||270)/(v.videoWidth||480)));
-      // seek to quarter
       function onSeek(){
         try{
           ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-          if(!resolved){ resolved = true; cleanup(); resolve({thumb:dataUrl, width:v.videoWidth, height:v.videoHeight}); }
+          if(!resolved){ resolved = true; cleanup(); resolve({thumb:dataUrl, width:v.videoWidth, height:v.videoHeight, duration:v.duration}); }
         }catch(e){
-          if(!resolved){ resolved=true; cleanup(); resolve({thumb:null, width:v.videoWidth, height:v.videoHeight}); }
+          if(!resolved){ resolved=true; cleanup(); resolve({thumb:null, width:v.videoWidth, height:v.videoHeight, duration:v.duration}); }
         }
       }
-      // if duration 0 or seek not supported, fallback to drawing first frame after short delay
       v.currentTime = Math.min(t, v.duration || t);
       v.addEventListener('seeked', onSeek, {once:true});
-      // timeout fallback
-      setTimeout(()=>{ if(!resolved){ try{ ctx.drawImage(v,0,0,canvas.width,canvas.height); }catch(_){} resolved=true; cleanup(); resolve({thumb:canvas.toDataURL('image/jpeg',0.7), width:v.videoWidth, height:v.videoHeight}); } }, 900);
+      setTimeout(()=>{ if(!resolved){ try{ ctx.drawImage(v,0,0,canvas.width,canvas.height);}catch(_){} resolved=true; cleanup(); resolve({thumb:canvas.toDataURL('image/jpeg',0.7), width:v.videoWidth, height:v.videoHeight, duration:v.duration}); } }, 900);
     });
 
-    v.addEventListener('error', ()=>{
-      if(!resolved){ resolved=true; cleanup(); resolve({thumb:null,width:0,height:0}); }
-    });
+    v.addEventListener('error', ()=>{ if(!resolved){ resolved=true; cleanup(); resolve({thumb:null,width:0,height:0,duration:0}); }});
   });
 }
 
-/* ---------- Try to estimate FPS (best effort) ---------- */
+/* ---------- Estimate FPS (best-effort) ---------- */
 async function estimateFPS(fileUrl, duration){
   return new Promise((resolve)=>{
     try{
-      // create video and try to use getVideoPlaybackQuality if available
       const v = document.createElement('video');
       v.preload='metadata';
       v.muted=true;
       v.src = fileUrl;
       v.addEventListener('loadedmetadata', ()=>{
-        // play briefly muted to allow measurement (some browsers need play)
         const tryMeasure = ()=>{
           try{
             if(typeof v.getVideoPlaybackQuality === 'function'){
               const q = v.getVideoPlaybackQuality();
               if(q && q.totalVideoFrames && duration > 0){
                 const fps = Math.round(q.totalVideoFrames / duration);
-                resolve(fps || 'Unknown');
-                v.src=''; return;
+                resolve(fps || 'Unknown'); v.src=''; return;
               }
             }
-            // some browsers expose mozDecodedFrames / webkitDecodedFrameCount
             const frames = v.webkitDecodedFrameCount || v.mozPaintCount || 0;
-            if(frames && duration>0){
-              resolve(Math.round(frames/duration) || 'Unknown'); v.src=''; return;
-            }
-            resolve('Unknown');
-            v.src='';
+            if(frames && duration>0){ resolve(Math.round(frames/duration) || 'Unknown'); v.src=''; return; }
+            resolve('Unknown'); v.src='';
           }catch(e){ resolve('Unknown'); v.src=''; }
         };
-        // try to play silently for short time (may be blocked) but we'll still try measure
         v.play().then(()=>{ setTimeout(()=>{ v.pause(); tryMeasure(); }, 300); }).catch(()=>{ tryMeasure(); });
       });
       v.addEventListener('error', ()=>resolve('Unknown'));
@@ -268,49 +258,43 @@ async function estimateFPS(fileUrl, duration){
   });
 }
 
-/* ---------- Build card markup ---------- */
+/* ---------- Build card ---------- */
 function buildCard(item, idx){
   const isVideo = item.file.type.startsWith('video/');
-  const card = document.createElement('div');
-  card.className = 'card' + (isListView ? ' row' : '');
+  const card = document.createElement('div'); card.className = 'card' + (isListView ? ' row' : '');
 
-  // thumbnail
-  const thumbWrap = document.createElement('div');
-  thumbWrap.className = 'thumb-wrap';
-  const img = document.createElement('img');
-  img.className = 'thumb';
-  img.alt = item.file.name;
-  if(item.thumbUrl) img.src = item.thumbUrl;
-  else img.style.background = '#000';
+  const thumbWrap = document.createElement('div'); thumbWrap.className = 'thumb-wrap';
+  const img = document.createElement('img'); img.className = 'thumb'; img.alt = item.file.name;
+  if(item.thumbUrl) img.src = item.thumbUrl; else img.style.background = '#000';
   thumbWrap.appendChild(img);
-
-  // duration badge (if known)
-  const durBadge = document.createElement('div');
-  durBadge.className = 'duration-badge';
-  durBadge.textContent = item.metadata && item.metadata.duration ? formatTime(item.metadata.duration) : '00:00';
+  const durBadge = document.createElement('div'); durBadge.className = 'duration-badge'; durBadge.textContent = item.metadata.duration ? formatTime(item.metadata.duration) : '00:00';
   thumbWrap.appendChild(durBadge);
 
-  // meta
-  const meta = document.createElement('div');
-  meta.className = 'meta';
+  // watched progress bar
+  const watchedWrap = document.createElement('div'); watchedWrap.className = 'watched-bar-wrap';
+  const watchedBar = document.createElement('div'); watchedBar.className = 'watched-bar';
+  // compute percent
+  const percent = (item.metadata.duration && item.playedSeconds) ? Math.min(100, (item.playedSeconds / item.metadata.duration) * 100) : 0;
+  watchedBar.style.width = percent + '%';
+  watchedWrap.appendChild(watchedBar);
+  thumbWrap.appendChild(watchedWrap);
+
+  const meta = document.createElement('div'); meta.className = 'meta';
   const title = document.createElement('h3'); title.textContent = item.file.name;
   const tagRow = document.createElement('div'); tagRow.className = 'tags';
   const tagType = document.createElement('span'); tagType.className='tag'; tagType.textContent = item.file.type.split('/')[0].toUpperCase();
   tagRow.appendChild(tagType);
 
-  // detail row: length, resolution, fps, size, date, playedTime
+  // detail row: size, date, played time (we removed length,res,fps)
   const details = document.createElement('div'); details.className = 'detail-row';
-  const lengthEl = document.createElement('div'); lengthEl.textContent = 'Length: ' + (item.metadata.duration? formatTime(item.metadata.duration) : 'Unknown');
-  const resEl = document.createElement('div'); resEl.textContent = 'Res: ' + (item.metadata.width ? `${item.metadata.width}x${item.metadata.height}` : 'Unknown');
-  const fpsEl = document.createElement('div'); fpsEl.textContent = 'FPS: ' + (item.metadata.fps || 'Unknown');
   const sizeEl = document.createElement('div'); sizeEl.textContent = 'Size: ' + formatBytes(item.file.size);
   const dateEl = document.createElement('div'); dateEl.textContent = 'Date: ' + new Date(item.file.lastModified).toLocaleDateString();
-  const playedEl = document.createElement('div'); playedEl.textContent = 'Played: ' + (item.played? formatTime(item.played) : '0:00');
-  details.append(lengthEl,resEl,fpsEl,sizeEl,dateEl,playedEl);
+  const playedEl = document.createElement('div'); playedEl.textContent = 'Played: ' + (item.playedSeconds? formatTime(item.playedSeconds) : '0:00');
+  details.append(sizeEl, dateEl, playedEl);
 
   meta.append(title, tagRow, details);
 
-  // click behavior - open in native player overlay
+  // clicking opens popup player only (no inline play)
   const openPlayer = (e)=>{
     e.stopPropagation();
     openInPlayer(idx);
@@ -318,14 +302,9 @@ function buildCard(item, idx){
   thumbWrap.addEventListener('click', openPlayer);
   meta.addEventListener('click', openPlayer);
 
-  // append to card
   card.appendChild(thumbWrap);
   card.appendChild(meta);
-
-  // subtle animation for new items
   card.style.opacity = 0; setTimeout(()=>{ card.style.opacity = 1; }, 40);
-
-  // add to gallery
   return card;
 }
 
@@ -333,70 +312,90 @@ function buildCard(item, idx){
 function renderGallery(){
   galleryEl.innerHTML = '';
   const filter = typeFilter.value;
-  const filesToShow = allFiles.filter(it => (filter==='all' ? true : it.file.type.startsWith(filter)));
-
-  // apply sort
+  let toShow = allFiles.filter(it => (filter === 'all' ? true : it.file.type.startsWith(filter)));
   const sortBy = sortSelect.value;
-  filesToShow.sort((a,b)=>{
-    if(sortBy==='title') return a.file.name.localeCompare(b.file.name);
-    if(sortBy==='type') return a.file.type.localeCompare(b.file.type);
-    if(sortBy==='date') return a.file.lastModified - b.file.lastModified;
-    if(sortBy==='size') return a.file.size - b.file.size;
-    if(sortBy==='length'){
+
+  toShow.sort((a,b)=>{
+    if(sortBy === 'title') return a.file.name.localeCompare(b.file.name);
+    if(sortBy === 'type') return a.file.type.localeCompare(b.file.type);
+    if(sortBy === 'date') return a.file.lastModified - b.file.lastModified;
+    if(sortBy === 'size') return a.file.size - b.file.size;
+    if(sortBy === 'length'){
       const da = a.metadata.duration || 0, db = b.metadata.duration || 0; return da - db;
-    }
-    if(sortBy==='resolution'){
-      const ra = (a.metadata.width||0)*(a.metadata.height||0), rb = (b.metadata.width||0)*(b.metadata.height||0); return rb - ra;
     }
     return 0;
   });
 
-  // grid or list classes
   galleryEl.classList.toggle('list', isListView);
-
-  filesToShow.forEach((it, idx)=>{
+  toShow.forEach((it, idx) => {
     const card = buildCard(it, idx);
-    // on list view we want row look
     if(isListView) card.classList.add('row');
     galleryEl.appendChild(card);
   });
 }
 
-/* ---------- Open in native browser player overlay ---------- */
+/* ---------- Open item in overlay player ---------- */
 function openInPlayer(index){
   const item = allFiles[index];
   if(!item) return;
-  // cleanup previous
   player.pause(); audioPlayer.pause();
   player.removeAttribute('src'); audioPlayer.removeAttribute('src');
-
   const url = item.url;
   const isVideo = item.file.type.startsWith('video/');
   playerContainer.style.display = 'flex';
+  playerContainer.setAttribute('aria-hidden','false');
 
   if(isVideo){
     audioPlayer.style.display = 'none';
     player.style.display = 'block';
     player.src = url;
-    player.currentTime = item.played || 0;
-    // update meta area
-    playerMeta.textContent = `${item.file.name} • ${item.metadata.width ? item.metadata.width + 'x' + item.metadata.height : 'Res: unknown'} • ${item.file.size ? formatBytes(item.file.size) : ''}`;
-    player.play().catch(()=>{ /* autoplay blocked until user interacts, fine */ });
-    // track playing time while open
-    player.ontimeupdate = ()=>{ item.played = player.currentTime; renderGallery(); };
+    const start = loadPlayedPosition(item.file) || item.playedSeconds || 0;
+    try{ player.currentTime = start; }catch(e){}
+    player.play().catch(()=>{ /* may be blocked until user interacts but popup click is gesture */});
+    player.ontimeupdate = ()=> {
+      item.playedSeconds = player.currentTime;
+      savePlayedPosition(item.file, player.currentTime);
+      updateWatchedBar(item);
+    };
+    player.onended = ()=>{ item.playedSeconds = item.metadata.duration || 0; savePlayedPosition(item.file, item.playedSeconds); updateWatchedBar(item); };
+    playerMeta.textContent = `${item.file.name} • ${item.file.size ? formatBytes(item.file.size) : ''}`;
   } else {
-    // audio
     player.style.display = 'none';
     audioPlayer.style.display = 'block';
     audioPlayer.src = url;
-    audioPlayer.currentTime = item.played || 0;
-    playerMeta.textContent = `${item.file.name} • Audio • ${item.file.size ? formatBytes(item.file.size) : ''}`;
+    const start = loadPlayedPosition(item.file) || item.playedSeconds || 0;
+    try{ audioPlayer.currentTime = start; }catch(e){}
     audioPlayer.play().catch(()=>{ /* may require user gesture */});
-    audioPlayer.ontimeupdate = ()=>{ item.played = audioPlayer.currentTime; renderGallery(); };
+    audioPlayer.ontimeupdate = ()=> {
+      item.playedSeconds = audioPlayer.currentTime;
+      savePlayedPosition(item.file, audioPlayer.currentTime);
+      updateWatchedBar(item);
+    };
+    audioPlayer.onended = ()=>{ item.playedSeconds = item.metadata.duration || 0; savePlayedPosition(item.file, item.playedSeconds); updateWatchedBar(item); };
+    playerMeta.textContent = `${item.file.name} • Audio • ${item.file.size ? formatBytes(item.file.size) : ''}`;
   }
 }
 
-/* ---------- Event handlers for inputs ---------- */
+/* ---------- Update watched bar for a single item ---------- */
+function updateWatchedBar(item){
+  // find its card in DOM by matching filename; quicker approach would use dataset keys
+  const cards = Array.from(galleryEl.querySelectorAll('.card'));
+  for(const card of cards){
+    const title = card.querySelector('.meta h3');
+    if(title && title.textContent === item.file.name){
+      const bar = card.querySelector('.watched-bar');
+      if(bar && item.metadata.duration){
+        const pct = Math.min(100, ((item.playedSeconds || 0) / item.metadata.duration) * 100);
+        bar.style.width = pct + '%';
+      }
+      const playedEl = card.querySelector('.detail-row div:nth-child(3)');
+      if(playedEl) playedEl.textContent = 'Played: ' + (item.playedSeconds? formatTime(item.playedSeconds) : '0:00');
+      break;
+    }
+  }
+}
+
+/* ---------- Input handlers & ingestion ---------- */
 fileInput.addEventListener('change', async (e)=>{
   const files = Array.from(e.target.files || []);
   await ingestFiles(files);
@@ -409,14 +408,13 @@ folderInput.addEventListener('change', async (e)=>{
 typeFilter.addEventListener('change', renderGallery);
 sortSelect.addEventListener('change', renderGallery);
 
+/* view/theme toggles */
 viewToggle.addEventListener('click', ()=>{
   isListView = !isListView;
   viewToggle.textContent = isListView ? '📋 List' : '🔲 Grid';
   viewIndicator.querySelector('.icon').textContent = isListView ? '📋' : '🔲';
   renderGallery();
 });
-
-/* theme toggle */
 themeToggle.addEventListener('click', ()=>{
   isLight = !isLight;
   document.body.classList.toggle('light', isLight);
@@ -430,85 +428,97 @@ closeBtn.addEventListener('click', ()=>{
   playerContainer.style.display = 'none';
 });
 
-/* ---------- Ingest files, compute metadata & thumbs ---------- */
+/* ---------- Ingest files (metadata + thumbnail) ---------- */
 async function ingestFiles(fileList){
-  // process files, gather metadata and thumb
   for(const f of fileList){
     if(!f.type || (!f.type.startsWith('video/') && !f.type.startsWith('audio/'))) continue;
-    const url = URL.createObjectURL(f);
-    const entry = { file: f, url: url, metadata: {}, thumbUrl: null, played: 0 };
+    // skip if already exists (by fingerprint)
+    const key = fileKey(f);
+    if(allFiles.some(x=>fileKey(x.file)===key)) continue;
 
-    // set size/date quickly
+    const url = URL.createObjectURL(f);
+    const entry = { file: f, url: url, metadata: {}, thumbUrl: null, playedSeconds: loadPlayedPosition(f) || 0 };
+
+    // populate small metadata quickly
     entry.metadata.size = f.size;
     entry.metadata.date = f.lastModified;
 
     if(f.type.startsWith('video/')){
       try{
-        // capture thumbnail at 1/4 duration
-        const {thumb, width, height} = await captureThumbnail(url);
+        const {thumb, width, height, duration} = await captureThumbnail(url);
         entry.thumbUrl = thumb;
         entry.metadata.width = width;
         entry.metadata.height = height;
+        entry.metadata.duration = duration || 0;
       }catch(e){
         entry.thumbUrl = null;
+        entry.metadata.duration = 0;
       }
-
-      // create short video element to load metadata duration
-      const v = document.createElement('video');
-      v.preload = 'metadata';
-      v.muted = true;
-      v.src = url;
-      await new Promise((res)=>{ v.addEventListener('loadedmetadata', ()=>res(), {once:true}); v.addEventListener('error', ()=>res(), {once:true}); });
-      entry.metadata.duration = v.duration || 0;
-      // try estimate fps
-      entry.metadata.fps = await estimateFPS(url, entry.metadata.duration);
+      // try FPS best-effort (optional, but we are removing display)
+      entry.metadata.fps = await estimateFPS(url, entry.metadata.duration).catch(()=> 'Unknown');
     } else {
-      // audio file: use a tiny audio element to get duration
+      // audio
       const a = document.createElement('audio'); a.preload='metadata'; a.src = url;
       await new Promise((res)=>{ a.addEventListener('loadedmetadata', ()=>res(), {once:true}); a.addEventListener('error', ()=>res(), {once:true}); });
       entry.metadata.duration = a.duration || 0;
-      // set generic thumb (blank) or icon
       entry.thumbUrl = null;
     }
+
     allFiles.push(entry);
-    // small animation effect: new items pulse once
     renderGallery();
   }
-  // default sort by type
-  sortSelect.value = sortSelect.value || 'type';
-  renderGallery();
 }
 
-/* ---------- Remove path field (we do not display path) ---------- */
-/* path intentionally not shown per request */
+/* ---------- estimateFPS helper used earlier ---------- */
+async function estimateFPS(fileUrl, duration){
+  return new Promise((resolve)=>{
+    try{
+      const v = document.createElement('video');
+      v.preload='metadata';
+      v.muted=true;
+      v.src = fileUrl;
+      v.addEventListener('loadedmetadata', ()=>{
+        const tryMeasure = ()=>{
+          try{
+            if(typeof v.getVideoPlaybackQuality === 'function'){
+              const q = v.getVideoPlaybackQuality();
+              if(q && q.totalVideoFrames && duration > 0){ const fps = Math.round(q.totalVideoFrames / duration); resolve(fps || 'Unknown'); v.src=''; return; }
+            }
+            const frames = v.webkitDecodedFrameCount || v.mozPaintCount || 0;
+            if(frames && duration>0){ resolve(Math.round(frames/duration) || 'Unknown'); v.src=''; return; }
+            resolve('Unknown'); v.src='';
+          }catch(e){ resolve('Unknown'); v.src=''; }
+        };
+        v.play().then(()=>{ setTimeout(()=>{ v.pause(); tryMeasure(); }, 300); }).catch(()=>{ tryMeasure(); });
+      });
+      v.addEventListener('error', ()=>resolve('Unknown'));
+    }catch(e){ resolve('Unknown'); }
+  });
+}
 
-/* ---------- Fix audio mobile blank issues ---------- */
-/*
-  - We show the audioPlayer element when playing audio items.
-  - On iOS/Android the playback will start only after user gesture; clicking the item is a user gesture.
-  - Ensure audioPlayer.controls is visible; set audioPlayer.src and call play() inside openInPlayer.
-*/
+/* ---------- Update watched bars initially from saved positions ---------- */
+function applySavedPositions(){
+  for(const it of allFiles){
+    const saved = loadPlayedPosition(it.file);
+    if(saved) it.playedSeconds = saved;
+  }
+}
 
-/* ---------- Cleanup object URLs on unload ---------- */
+/* ---------- Cleanup on unload ---------- */
 window.addEventListener('beforeunload', ()=>{
   allFiles.forEach(it => { try{ URL.revokeObjectURL(it.url); }catch(e){} });
 });
 
-/* ---------- Accessibility: keyboard open/close ---------- */
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape') { if(playerContainer.style.display==='flex') closeBtn.click(); }
-});
+/* ---------- Keyboard accessibility ---------- */
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ if(playerContainer.style.display === 'flex') closeBtn.click(); } });
 
-/* ---------- Nice initial demo state instructions ---------- */
+/* init */
 (function init(){
   viewToggle.textContent = '🔲 Grid';
   themeToggle.textContent = '🌙 Dark';
   themeIndicator.querySelector('.icon').textContent = '🌙';
   viewIndicator.querySelector('.icon').textContent = '🔲';
-  // subtle hint
-  setTimeout(()=>{ /* no-op */ }, 200);
 })();
-
 </script>
 </body>
 </html>
