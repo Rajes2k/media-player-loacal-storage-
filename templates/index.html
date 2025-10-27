@@ -1,197 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Local Folder Media Player — Rajes</title>
+  <meta charset="UTF-8">
+  <title>Rajes Media Player</title>
   <style>
-    :root {
-      --bg: #0b0f14;
-      --panel: #0f1620;
-      --accent: #00c3ff;
-      --muted: #9aa6b2;
-      --card: #10161d;
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: white;
+      margin: 0;
+      padding: 0;
+      text-align: center;
     }
-    body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#e6eef6;display:flex;flex-direction:column;align-items:center;padding:18px;}
-    .app{width:100%;max-width:1100px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px}
-    h1{margin:0;font-size:20px;color:var(--accent)}
-    .controls{display:flex;gap:10px;align-items:center}
-    button, .btn {background:var(--accent);color:#051018;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;}
-    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-    .layout{display:grid;grid-template-columns:1fr 360px;gap:16px}
-    .player-panel{background:var(--panel);padding:14px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.6)}
-    video{width:100%;height:auto;border-radius:8px;background:black}
-    .meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;color:var(--muted)}
-    .list{background:var(--card);padding:12px;border-radius:10px;height:70vh;overflow:auto}
-    .file-item{padding:8px;margin-bottom:8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-    .file-item:hover{background:rgba(0,195,255,0.06)}
-    .file-name{flex:1;padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .small{font-size:13px;color:var(--muted)}
-    .hint{margin-top:8px;color:var(--muted);font-size:13px}
-    @media (max-width:900px){.layout{grid-template-columns:1fr}}
+    h1 {
+      color: #00bcd4;
+      margin-top: 20px;
+    }
+    .controls {
+      margin: 20px;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    label {
+      background: #00bcd4;
+      color: white;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+    .thumb {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #1c1c1c;
+      cursor: pointer;
+    }
+    .thumb video {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+    .thumb span {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      background: rgba(0,0,0,0.7);
+      padding: 2px 5px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    #player-container {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    #player {
+      width: 90%;
+      height: auto;
+      max-height: 90%;
+    }
+    #close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 25px;
+      cursor: pointer;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>🎬 Rajes — Local Folder Media Player</h1>
-      <div class="controls">
-        <button id="pickDirBtn" class="btn">Select Folder (Desktop Chrome/Edge)</button>
-        <label class="btn secondary" style="display:inline-block;">
-          <input id="fallbackPick" type="file" accept="video/*,audio/*" multiple style="display:none">
-          Select Files
-        </label>
-      </div>
-    </header>
+  <h1>🎬 Rajes Media Player</h1>
+  <div class="controls">
+    <label for="fileInput">🎞️ Select Files</label>
+    <input type="file" id="fileInput" accept="video/*" multiple>
 
-    <div class="layout">
-      <div class="player-panel">
-        <video id="player" controls preload="metadata"></video>
-        <div class="meta">
-          <div>
-            <div id="nowPlaying" style="font-weight:600">No file selected</div>
-            <div class="small" id="fileInfo">—</div>
-          </div>
-          <div class="small" id="timeInfo">00:00 / 00:00</div>
-        </div>
-        <div class="hint">Tip: choose a folder that contains your videos. No file gets uploaded — they stay on your device.</div>
-      </div>
-
-      <div>
-        <div class="list" id="fileList">
-          <div class="small" style="padding:6px 0 12px 6px">No folder selected. Use "Select Folder" (Chrome/Edge) or "Select Files".</div>
-        </div>
-      </div>
-    </div>
+    <label for="folderInput">📁 Select Folder</label>
+    <input type="file" id="folderInput" accept="video/*" webkitdirectory>
   </div>
 
-<script>
-/*
-  Local Folder Media Player
-  - Uses showDirectoryPicker (File System Access API) when available
-  - Fallback: multiple file input
-  - All playback uses blob URLs (no upload)
-*/
+  <div class="gallery" id="gallery"></div>
 
-const pickDirBtn = document.getElementById('pickDirBtn');
-const fallbackPick = document.getElementById('fallbackPick');
-const fileList = document.getElementById('fileList');
-const player = document.getElementById('player');
-const nowPlaying = document.getElementById('nowPlaying');
-const fileInfo = document.getElementById('fileInfo');
-const timeInfo = document.getElementById('timeInfo');
+  <div id="player-container">
+    <span id="close">✖</span>
+    <video id="player" controls></video>
+  </div>
 
-let currentBlobUrl = null;
-let directoryHandle = null;
-let handles = []; // array of {name, handle} or {name, file}
+  <script>
+    const gallery = document.getElementById('gallery');
+    const playerContainer = document.getElementById('player-container');
+    const player = document.getElementById('player');
+    const closeBtn = document.getElementById('close');
 
-/* Utility to format time */
-function fmtTime(s){
-  if (!isFinite(s) || isNaN(s)) return '00:00';
-  const m = Math.floor(s/60); const sec = Math.floor(s%60);
-  return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
-}
+    closeBtn.onclick = () => {
+      player.pause();
+      playerContainer.style.display = 'none';
+    };
 
-/* Play a File handle or File object */
-async function playFile(item){
-  try{
-    // revoke previous blob
-    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-    let file;
-    if (item.handle && item.handle.getFile){ // file handle (from directory)
-      file = await item.handle.getFile();
-    } else if (item.file){ // file object (from file input)
-      file = item.file;
-    } else {
-      console.warn('Unsupported item', item);
-      return;
+    function showVideos(files) {
+      gallery.innerHTML = '';
+      [...files].forEach(file => {
+        if (!file.type.startsWith('video/')) return;
+
+        const url = URL.createObjectURL(file);
+        const div = document.createElement('div');
+        div.className = 'thumb';
+
+        const video = document.createElement('video');
+        video.src = url;
+        video.muted = true;
+        video.preload = 'metadata';
+        video.addEventListener('loadedmetadata', () => {
+          const duration = Math.floor(video.duration);
+          const mins = Math.floor(duration / 60);
+          const secs = duration % 60;
+          const label = document.createElement('span');
+          label.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+          div.appendChild(label);
+        });
+
+        div.onclick = () => {
+          player.src = url;
+          playerContainer.style.display = 'flex';
+          player.play();
+        };
+
+        div.appendChild(video);
+        gallery.appendChild(div);
+      });
     }
-    const blobUrl = URL.createObjectURL(file);
-    currentBlobUrl = blobUrl;
-    player.src = blobUrl;
-    nowPlaying.textContent = item.name || file.name;
-    fileInfo.textContent = `${(file.size/1024/1024).toFixed(2)} MB • ${file.type || 'video'}`;
-    player.play().catch(()=>{});
-  }catch(err){
-    console.error(err);
-    alert('Unable to play file. Permission denied or file invalid.');
-  }
-}
 
-/* Render list in the sidebar */
-function renderList(){
-  fileList.innerHTML = '';
-  if (!handles.length) {
-    fileList.innerHTML = '<div class="small" style="padding:6px 0 12px 6px">No files found in chosen folder.</div>';
-    return;
-  }
-  for (const item of handles){
-    const row = document.createElement('div');
-    row.className = 'file-item';
-    row.innerHTML = `<div class="file-name">${item.name}</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn secondary play-btn">Play</button>
-      </div>`;
-    // click row or play button
-    row.querySelector('.play-btn').addEventListener('click', (e)=>{
-      e.stopPropagation();
-      playFile(item);
+    document.getElementById('fileInput').addEventListener('change', e => {
+      showVideos(e.target.files);
     });
-    row.addEventListener('click', ()=>playFile(item));
-    fileList.appendChild(row);
-  }
-}
 
-/* When media timeupdate: update timeInfo */
-player.addEventListener('timeupdate', ()=>{
-  timeInfo.textContent = `${fmtTime(player.currentTime)} / ${fmtTime(player.duration)}`;
-});
-
-/* Directory picker approach (Chromium) */
-async function pickDirectory(){
-  if (!window.showDirectoryPicker){
-    alert('Directory picker not available in this browser. Use "Select Files" instead (fallback).');
-    return;
-  }
-  try {
-    directoryHandle = await window.showDirectoryPicker();
-    // iterate entries and collect file handles with supported extensions
-    handles = [];
-    const allowed = ['mp4','mkv','webm','mov','ogg','mp3','wav','flac','m4a'];
-    // dir.entries() gives async iterator of [name, handle]
-    for await (const [name, handle] of directoryHandle.entries()){
-      if (handle.kind === 'file'){
-        const ext = name.split('.').pop().toLowerCase();
-        if (allowed.includes(ext)){
-          handles.push({name, handle});
-        }
-      }
-    }
-    // optionally sort by name
-    handles.sort((a,b) => a.name.localeCompare(b.name));
-    renderList();
-  } catch (err){
-    console.error('Directory pick error', err);
-    if (err.name !== 'AbortError') alert('Error opening folder: ' + (err.message || err));
-  }
-}
-
-/* Fallback: multiple file input */
-fallbackPick.addEventListener('change', (ev)=>{
-  const files = Array.from(ev.target.files || []);
-  handles = files.map(f => ({name: f.name, file: f}));
-  handles.sort((a,b)=>a.name.localeCompare(b.name));
-  renderList();
-});
-
-/* hook button */
-pickDirBtn.addEventListener('click', pickDirectory);
-
-/* Optional: try to restore folder handle from storage if previously stored
-   (persistence across sessions requires storing handle in IndexedDB and the browser
-    granting persistent permission — skipping implementation to keep this simple)
-*/
-</script>
+    document.getElementById('folderInput').addEventListener('change', e => {
+      showVideos(e.target.files);
+    });
+  </script>
 </body>
 </html>
