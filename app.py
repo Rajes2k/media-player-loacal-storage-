@@ -1,67 +1,28 @@
 import os
-from flask import Flask, render_template, request, send_file, jsonify
-from moviepy.editor import VideoFileClip
-from io import BytesIO
-from PIL import Image
-import mimetypes
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for, jsonify
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = "uploads"
+ALLOWED = {".mp4", ".mkv", ".webm", ".mov", ".ogg", ".mp3"}
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/")
 def index():
-    videos = []
-    for file in os.listdir(UPLOAD_FOLDER):
-        if file.lower().endswith(('.mp4', '.mkv', '.mov', '.avi', '.webm')):
-            path = os.path.join(UPLOAD_FOLDER, file)
-            try:
-                clip = VideoFileClip(path)
-                duration = int(clip.duration)
-                clip.close()
-                videos.append({
-                    "name": file,
-                    "path": file,
-                    "duration": f"{duration//60}:{duration%60:02d}"
-                })
-            except Exception:
-                continue
+    files = sorted(os.listdir(UPLOAD_FOLDER))
+    videos = [f for f in files if os.path.splitext(f)[1].lower() in ALLOWED]
     return render_template("index.html", videos=videos)
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    if "file" not in request.files:
-        return "No file", 400
-    file = request.files["file"]
-    if file.filename == "":
-        return "No filename", 400
-    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(filepath)
-    return "Uploaded successfully"
+    f = request.files.get("file")
+    if not f or f.filename == "":
+        return redirect(url_for("index"))
+    name = secure_filename(f.filename)
+    f.save(os.path.join(UPLOAD_FOLDER, name))
+    return redirect(url_for("index"))
 
-@app.route("/thumbnail/<filename>")
-def thumbnail(filename):
-    path = os.path.join(UPLOAD_FOLDER, filename)
-    if not os.path.exists(path):
-        return "Not Found", 404
-    clip = VideoFileClip(path)
-    frame = clip.get_frame(0.1)
-    clip.close()
-    img = Image.fromarray(frame)
-    buf = BytesIO()
-    img.save(buf, format="JPEG")
-    buf.seek(0)
-    return send_file(buf, mimetype="image/jpeg")
-
-@app.route("/play/<filename>")
-def play(filename):
-    path = os.path.join(UPLOAD_FOLDER, filename)
-    if not os.path.exists(path):
-        return "Not Found", 404
-    mime, _ = mimetypes.guess_type(path)
-    if not mime:
-        mime = "video/mp4"
-    return send_file(path, mimetype=mime)
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+@app.route("/uploads/<path:filename>")
+def serve_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename, conditional=True)

@@ -1,92 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>🎬 Rajes Media Player</title>
-<style>
-body {
-  background-color: #0e0e0e;
-  color: #fff;
-  font-family: Arial;
-  margin: 0;
-  padding: 20px;
-}
-h1 { color: #ff9800; }
-.upload-section {
-  margin-bottom: 20px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-.card {
-  background-color: #1a1a1a;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: 0.3s;
-}
-.card:hover {
-  transform: scale(1.05);
-}
-.thumb {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-}
-.details {
-  text-align: center;
-  padding: 8px;
-}
-.title {
-  font-weight: bold;
-  font-size: 14px;
-}
-.duration {
-  font-size: 12px;
-  color: #bbb;
-}
-video {
-  width: 80%;
-  margin: 20px auto;
-  display: block;
-  border-radius: 10px;
-}
-</style>
-</head>
-<body>
-
-<h1>🎬 Rajes Media Player (Render Version)</h1>
-
-<div class="upload-section">
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <button type="submit">Upload</button>
-  </form>
-</div>
-
-<div class="grid">
-  {% for v in videos %}
-  <div class="card" onclick="play('{{v.path}}')">
-    <img class="thumb" src="/thumbnail/{{v.path}}">
-    <div class="details">
-      <div class="title">{{v.name}}</div>
-      <div class="duration">{{v.duration}}</div>
-    </div>
-  </div>
-  {% endfor %}
-</div>
-
-<video id="player" controls></video>
-
+<img id="thumb-{{loop.index}}" src="/static/placeholder.jpg" data-video-url="/uploads/{{v}}">
 <script>
-function play(filename) {
-  const player = document.getElementById('player');
-  player.src = '/play/' + filename;
-  player.scrollIntoView({ behavior: 'smooth' });
-  player.play();
+async function captureThumb(imgEl, videoUrl) {
+  try {
+    const video = document.createElement('video');
+    video.crossOrigin = "anonymous";
+    video.src = videoUrl;
+    video.muted = true;
+    await video.play().catch(()=>{}); // some browsers block autoplay
+    video.currentTime = 0.6;
+    await new Promise(res => video.onseeked = res);
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    imgEl.src = canvas.toDataURL('image/jpeg');
+    video.pause();
+  } catch(err){
+    console.warn('thumb capture failed', err);
+  }
 }
+document.querySelectorAll('img[data-video-url]').forEach(img=>{
+  captureThumb(img, img.dataset.videoUrl);
+});
 </script>
-
-</body>
-</html>
