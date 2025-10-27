@@ -1,6 +1,6 @@
-flask
-moviepy
-pillow
-gunicorn
-opencv-python
-imageio[ffmpeg]
+Flask==3.0.3
+moviepy==1.0.3
+imageio[ffmpeg]==2.34.0
+opencv-python==4.9.0.80
+Pillow==10.2.0
+gunicorn==21.2.0
