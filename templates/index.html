@@ -10,67 +10,79 @@
     --panel-dark:#14181b;
     --muted-dark:rgba(255,255,255,0.85);
     --accent:#00bcd4;
-    --card-shadow: 0 6px 20px rgba(0,0,0,0.45);
-    --watched-red: #ea4335;
-    --bg-light:#f6f7f9;
-    --panel-light:#ffffff;
-    --muted-light:rgba(0,0,0,0.8);
+    --card-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    --accent-2:#02a7b7;
+    --red:#ef476f;
+    --thumb-w:160px;
   }
-
   html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Arial, sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{background:var(--bg-dark);color:var(--muted-dark);transition:background .25s,color .25s}
-  body.light{background:var(--bg-light);color:var(--muted-light)}
+  body.light{background:#f6f7f9;color:#111}
 
-  header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--panel-dark);box-shadow:var(--card-shadow);position:sticky;top:0;z-index:10}
-  body.light header{background:var(--panel-light)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--panel-dark);box-shadow:var(--card-shadow)}
+  body.light header{background:#fff}
   h1{margin:0;color:var(--accent);font-size:18px;display:flex;align-items:center;gap:8px}
-  .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-  .btn { background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; display:inline-flex; align-items:center; gap:8px;}
-  .btn.ghost { background:transparent; border:2px solid var(--accent); color:var(--accent); padding:6px 10px; }
-  input[type="file"]{display:none;}
+  .top-actions{display:flex;gap:8px;align-items:center}
+  .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+  .btn.ghost{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:6px 10px}
+  input[type=file]{display:none}
 
-  .indicator{display:inline-flex;align-items:center;gap:8px;font-weight:700;padding:6px 8px;border-radius:8px;background:transparent;border:2px solid transparent}
-  .indicator .icon{font-size:18px}
+  .controls-row{padding:14px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+  .controls-left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .controls-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
-  .controls-row{padding:12px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
-  .controls-left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .controls-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
+  /* gallery */
   .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:18px;max-width:1200px;margin:0 auto}
   .gallery.list{display:flex;flex-direction:column;gap:10px;padding:10px 18px}
 
-  .card{background:var(--panel-dark);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column;position:relative;}
-  body.light .card{background:var(--panel-light);box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+  .card{background:var(--panel-dark);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column}
+  body.light .card{background:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
   .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.35)}
 
   .card.row{flex-direction:row;align-items:center;padding:8px;height:110px}
-  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:10px;background:#000}
-  .thumb{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb-wrap{position:relative;flex:0 0 var(--thumb-w);height:90px;overflow:hidden;border-radius:10px;margin:10px;background:#000}
+  .thumb{width:100%;height:100%;object-fit:cover;display:block;background:#000}
   .duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}
+  .progress-mini{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,0.08)}
+  .progress-mini .bar{height:100%;width:0;background:linear-gradient(90deg,var(--red),#ff8fab);}
 
   .meta{padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1}
   .meta h3{margin:0;font-size:15px;color:var(--muted-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  body.light .meta h3{color:var(--muted-light)}
-  .meta .tags{display:flex;gap:8px;flex-wrap:wrap}
-  .tag{background:rgba(0,0,0,0.35);color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}
-  body.light .tag{background:rgba(0,0,0,0.06);color:var(--muted-light)}
+  body.light .meta h3{color:#111}
+  .tags{display:flex;gap:8px;flex-wrap:wrap}
+  .tag{background:rgba(0,0,0,0.28);color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}
+  body.light .tag{background:rgba(0,0,0,0.06);color:#111}
 
-  .meta .detail-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted-dark)}
-  body.light .meta .detail-row{color:var(--muted-light)}
+  .detail-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted-dark)}
+  body.light .detail-row{color:#444}
 
-  /* watched progress bar under thumbnail (red line) */
-  .watched-bar-wrap{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.08)}
-  .watched-bar{height:100%;width:0%;background:var(--watched-red);transition:width .25s linear}
-
-  .pulse { animation: pulse 1.6s infinite; }
+  .pulse{animation:pulse 1.6s infinite}
   @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
 
-  #player-container{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:16px}
-  #player-box{width:100%;max-width:1100px;max-height:92%;display:flex;flex-direction:column;align-items:center;gap:8px}
+  /* player overlay */
+  #player-container{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center}
+  #player-box{width:95%;max-width:1100px;max-height:92%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px}
   #player{width:100%;height:auto;background:#000;border-radius:8px;outline:none}
   #audioPlayer{width:100%;display:none}
+  #controls-below{display:flex;gap:12px;align-items:center;justify-content:center;padding:8px;width:100%;background:transparent}
+  .player-control{background:rgba(255,255,255,0.06);color:#fff;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:700}
+  .player-control.toggled{background:var(--accent)}
   #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}
+
+  /* audio thumbnail icon */
+  .audio-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:36px;color:rgba(255,255,255,0.9);pointer-events:none}
+
+  /* audio animation bars */
+  .wave {display:inline-flex;gap:3px;align-items:end;height:26px}
+  .wave span{width:4px;height:8px;background:rgba(255,255,255,0.85);display:inline-block;border-radius:2px;animation:bar 1s linear infinite;}
+  .wave span:nth-child(2){animation-delay:.12s}
+  .wave span:nth-child(3){animation-delay:.24s}
+  .wave span:nth-child(4){animation-delay:.36s}
+  .wave span:nth-child(5){animation-delay:.48s}
+  .wave.playing span{animation-play-state:running}
+  .wave span{animation-play-state:paused}
+  @keyframes bar{0%{height:6px}50%{height:20px}100%{height:6px}}
 
   footer{padding:12px;text-align:center;color:rgba(255,255,255,0.45)}
 
@@ -85,8 +97,8 @@
   <header>
     <h1>🎬 Rajes Media Player</h1>
     <div class="top-actions">
-      <span id="themeIndicator" class="indicator" title="Theme"><span class="icon">🌙</span></span>
-      <span id="viewIndicator" class="indicator" title="View"><span class="icon">🔲</span></span>
+      <span id="themeIndicator">🌙</span>
+      <span id="viewIndicator">🔲</span>
     </div>
   </header>
 
@@ -110,12 +122,13 @@
         <option value="date">Date</option>
         <option value="length">Length</option>
         <option value="size">Size</option>
+        <option value="resolution">Resolution</option>
       </select>
     </div>
 
     <div class="controls-right">
-      <button id="viewToggle" class="btn ghost" title="Toggle grid/list">🔲 Grid</button>
-      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙 Dark</button>
+      <button id="viewToggle" class="btn ghost">🔲 Grid</button>
+      <button id="themeToggle" class="btn ghost">🌙 Dark</button>
     </div>
   </div>
 
@@ -123,16 +136,34 @@
     <div id="gallery" class="gallery"></div>
   </main>
 
-  <div id="player-container" role="dialog" aria-hidden="true">
+  <div id="player-container">
     <div id="player-box">
       <button id="close" title="Close">✖</button>
       <video id="player" controls playsinline webkit-playsinline></video>
       <audio id="audioPlayer" controls></audio>
+
+      <!-- controls below (option 2: separate control bar) -->
+      <div id="controls-below">
+        <button id="prevBtn" class="player-control">⟸ Prev</button>
+        <button id="playToggle" class="player-control">Play/Pause</button>
+        <button id="nextBtn" class="player-control">Next ⟹</button>
+
+        <button id="autoplayBtn" class="player-control">Autoplay: Off</button>
+
+        <button id="shuffleBtn" class="player-control">Shuffle: Off</button>
+
+        <div id="waveAnim" style="margin-left:12px;">
+          <div class="wave" id="waveBars">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
       <div id="player-meta" style="color:#fff;font-size:13px;width:100%;text-align:left"></div>
     </div>
   </div>
 
-  <footer>© 2025 Rajes Media Player — Your local media, remembered</footer>
+  <footer>© 2025 Rajes Media Player — local playback remembered</footer>
 
 <script>
 /* ---------- State ---------- */
@@ -147,111 +178,73 @@ const themeIndicator = document.getElementById('themeIndicator');
 const viewIndicator = document.getElementById('viewIndicator');
 
 const playerContainer = document.getElementById('player-container');
-const player = document.getElementById('player');
+const videoPlayer = document.getElementById('player');
 const audioPlayer = document.getElementById('audioPlayer');
 const closeBtn = document.getElementById('close');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const playToggle = document.getElementById('playToggle');
+const autoplayBtn = document.getElementById('autoplayBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
+const waveBars = document.getElementById('waveBars');
 const playerMeta = document.getElementById('player-meta');
 
-let allFiles = []; // {file, url, metadata:{duration,width,height,size,date,fps}, thumbUrl, playedSeconds}
+let allFiles = []; // {file,url,metadata,thumbUrl,played,index}
+let filteredFiles = [];
 let isListView = false;
 let isLight = false;
+let currentIndex = -1;
+let autoplayNext = false;
+let shuffleOn = false;
 
-/* ---------- LocalStorage helpers for last-played positions ---------- */
-function fileKey(file){
-  // stable fingerprint: name|size|lastModified
-  return `${file.name}|${file.size}|${file.lastModified}`;
-}
-function savePlayedPosition(file, seconds){
-  try{
-    const key = 'rmp_play_' + fileKey(file);
-    localStorage.setItem(key, String(seconds || 0));
-  }catch(e){}
-}
-function loadPlayedPosition(file){
-  try{
-    const key = 'rmp_play_' + fileKey(file);
-    const v = localStorage.getItem(key);
-    return v ? Number(v) : 0;
-  }catch(e){ return 0; }
-}
+/* ---------- Helpers ---------- */
+function formatBytes(bytes){ if(bytes===0) return '0 B'; const k=1024,s=['B','KB','MB','GB']; const i=Math.floor(Math.log(bytes)/Math.log(k)); return (bytes/Math.pow(k,i)).toFixed(2)+' '+s[i]; }
+function formatTime(s){ s=Number(s)||0; const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=Math.floor(s%60); if(h>0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; return `${m}:${String(sec).padStart(2,'0')}`; }
 
-/* ---------- Utils ---------- */
-function formatBytes(bytes){
-  if(bytes === 0) return '0 B';
-  const k = 1024, sizes = ['B','KB','MB','GB','TB'];
-  const i = Math.floor(Math.log(bytes)/Math.log(k));
-  return parseFloat((bytes/Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i];
-}
-function formatTime(s){
-  s = Number(s) || 0;
-  const h = Math.floor(s/3600);
-  const m = Math.floor((s%3600)/60);
-  const sec = Math.floor(s%60);
-  if(h>0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-  return `${m}:${String(sec).padStart(2,'0')}`;
-}
-
-/* ---------- Thumbnail capture at 1/4 duration ---------- */
+/* ---------- Thumbnail capture at 1/4 duration (best-effort) ---------- */
 async function captureThumbnail(url){
   return new Promise((resolve) => {
     const v = document.createElement('video');
-    v.crossOrigin = "anonymous";
-    v.muted = true;
-    v.preload = 'metadata';
-    v.src = url;
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    let resolved = false;
-    const cleanup = ()=>{ try{ v.src=''; v.load(); }catch(e){} };
-
+    v.muted = true; v.preload = 'metadata'; v.crossOrigin='anonymous'; v.src = url;
+    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+    let done=false;
     v.addEventListener('loadedmetadata', () => {
-      const t = Math.max(0.1, (v.duration || 0) * 0.25);
+      const t = Math.max(0.2, (v.duration||0) * 0.25);
       canvas.width = Math.min(480, v.videoWidth || 480);
       canvas.height = Math.round(canvas.width * ((v.videoHeight||270)/(v.videoWidth||480)));
-      function onSeek(){
+      function grab(){
         try{
-          ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-          if(!resolved){ resolved = true; cleanup(); resolve({thumb:dataUrl, width:v.videoWidth, height:v.videoHeight, duration:v.duration}); }
-        }catch(e){
-          if(!resolved){ resolved=true; cleanup(); resolve({thumb:null, width:v.videoWidth, height:v.videoHeight, duration:v.duration}); }
-        }
+          ctx.drawImage(v,0,0,canvas.width,canvas.height);
+          const data = canvas.toDataURL('image/jpeg',0.75);
+          if(!done){ done=true; resolve({thumb:data,w:v.videoWidth,h:v.videoHeight}); v.src=''; }
+        }catch(e){ if(!done){ done=true; resolve({thumb:null,w:v.videoWidth,h:v.videoHeight}); v.src=''; } }
       }
+      // seek then grab
       v.currentTime = Math.min(t, v.duration || t);
-      v.addEventListener('seeked', onSeek, {once:true});
-      setTimeout(()=>{ if(!resolved){ try{ ctx.drawImage(v,0,0,canvas.width,canvas.height);}catch(_){} resolved=true; cleanup(); resolve({thumb:canvas.toDataURL('image/jpeg',0.7), width:v.videoWidth, height:v.videoHeight, duration:v.duration}); } }, 900);
+      v.addEventListener('seeked', grab, {once:true});
+      setTimeout(()=>{ if(!done) grab(); }, 900);
     });
-
-    v.addEventListener('error', ()=>{ if(!resolved){ resolved=true; cleanup(); resolve({thumb:null,width:0,height:0,duration:0}); }});
+    v.addEventListener('error', ()=>{ if(!done){ done=true; resolve({thumb:null,w:0,h:0}); }});
   });
 }
 
 /* ---------- Estimate FPS (best-effort) ---------- */
-async function estimateFPS(fileUrl, duration){
+async function estimateFPS(url, duration){
   return new Promise((resolve)=>{
     try{
-      const v = document.createElement('video');
-      v.preload='metadata';
-      v.muted=true;
-      v.src = fileUrl;
+      const v = document.createElement('video'); v.preload='metadata'; v.muted=true; v.src=url;
       v.addEventListener('loadedmetadata', ()=>{
-        const tryMeasure = ()=>{
+        setTimeout(()=>{
           try{
             if(typeof v.getVideoPlaybackQuality === 'function'){
               const q = v.getVideoPlaybackQuality();
-              if(q && q.totalVideoFrames && duration > 0){
-                const fps = Math.round(q.totalVideoFrames / duration);
-                resolve(fps || 'Unknown'); v.src=''; return;
-              }
+              if(q && q.totalVideoFrames && duration>0){ resolve(Math.round(q.totalVideoFrames/duration)); v.src=''; return; }
             }
             const frames = v.webkitDecodedFrameCount || v.mozPaintCount || 0;
-            if(frames && duration>0){ resolve(Math.round(frames/duration) || 'Unknown'); v.src=''; return; }
+            if(frames && duration>0){ resolve(Math.round(frames/duration)); v.src=''; return; }
             resolve('Unknown'); v.src='';
           }catch(e){ resolve('Unknown'); v.src=''; }
-        };
-        v.play().then(()=>{ setTimeout(()=>{ v.pause(); tryMeasure(); }, 300); }).catch(()=>{ tryMeasure(); });
+        }, 300);
       });
       v.addEventListener('error', ()=>resolve('Unknown'));
     }catch(e){ resolve('Unknown'); }
@@ -262,49 +255,51 @@ async function estimateFPS(fileUrl, duration){
 function buildCard(item, idx){
   const isVideo = item.file.type.startsWith('video/');
   const card = document.createElement('div'); card.className = 'card' + (isListView ? ' row' : '');
-
   const thumbWrap = document.createElement('div'); thumbWrap.className = 'thumb-wrap';
-  const img = document.createElement('img'); img.className = 'thumb'; img.alt = item.file.name;
-  if(item.thumbUrl) img.src = item.thumbUrl; else img.style.background = '#000';
+  const img = document.createElement('img'); img.className='thumb'; img.alt=item.file.name;
+  if(item.thumbUrl) img.src = item.thumbUrl; else img.src = ''; // empty shows black background
   thumbWrap.appendChild(img);
-  const durBadge = document.createElement('div'); durBadge.className = 'duration-badge'; durBadge.textContent = item.metadata.duration ? formatTime(item.metadata.duration) : '00:00';
+
+  // duration badge and mini progress bar
+  const durBadge = document.createElement('div'); durBadge.className='duration-badge'; durBadge.textContent = item.metadata.duration ? formatTime(item.metadata.duration) : '00:00';
   thumbWrap.appendChild(durBadge);
+  const progMini = document.createElement('div'); progMini.className='progress-mini'; const innerBar = document.createElement('div'); innerBar.className='bar'; progMini.appendChild(innerBar); thumbWrap.appendChild(progMini);
+  // if audio -> show audio icon overlay
+  if(!isVideo){
+    const icon = document.createElement('div'); icon.className='audio-icon'; icon.innerHTML='🎵'; thumbWrap.appendChild(icon);
+  }
 
-  // watched progress bar
-  const watchedWrap = document.createElement('div'); watchedWrap.className = 'watched-bar-wrap';
-  const watchedBar = document.createElement('div'); watchedBar.className = 'watched-bar';
-  // compute percent
-  const percent = (item.metadata.duration && item.playedSeconds) ? Math.min(100, (item.playedSeconds / item.metadata.duration) * 100) : 0;
-  watchedBar.style.width = percent + '%';
-  watchedWrap.appendChild(watchedBar);
-  thumbWrap.appendChild(watchedWrap);
-
-  const meta = document.createElement('div'); meta.className = 'meta';
+  const meta = document.createElement('div'); meta.className='meta';
   const title = document.createElement('h3'); title.textContent = item.file.name;
-  const tagRow = document.createElement('div'); tagRow.className = 'tags';
-  const tagType = document.createElement('span'); tagType.className='tag'; tagType.textContent = item.file.type.split('/')[0].toUpperCase();
-  tagRow.appendChild(tagType);
+  const tags = document.createElement('div'); tags.className='tags';
+  const tTag = document.createElement('span'); tTag.className='tag'; tTag.textContent = item.file.type.split('/')[0].toUpperCase();
+  tags.appendChild(tTag);
 
-  // detail row: size, date, played time (we removed length,res,fps)
-  const details = document.createElement('div'); details.className = 'detail-row';
-  const sizeEl = document.createElement('div'); sizeEl.textContent = 'Size: ' + formatBytes(item.file.size);
-  const dateEl = document.createElement('div'); dateEl.textContent = 'Date: ' + new Date(item.file.lastModified).toLocaleDateString();
-  const playedEl = document.createElement('div'); playedEl.textContent = 'Played: ' + (item.playedSeconds? formatTime(item.playedSeconds) : '0:00');
-  details.append(sizeEl, dateEl, playedEl);
+  const details = document.createElement('div'); details.className='detail-row';
+  const len = document.createElement('div'); len.textContent = 'Length: ' + (item.metadata.duration ? formatTime(item.metadata.duration) : 'Unknown');
+  const res = document.createElement('div'); res.textContent = 'Res: ' + (item.metadata.width ? `${item.metadata.width}x${item.metadata.height}` : '—');
+  const fps = document.createElement('div'); fps.textContent = 'FPS: ' + (item.metadata.fps || '—');
+  const size = document.createElement('div'); size.textContent = 'Size: ' + formatBytes(item.file.size);
+  const date = document.createElement('div'); date.textContent = 'Date: ' + new Date(item.file.lastModified).toLocaleDateString();
+  const played = document.createElement('div'); played.textContent = 'Played: ' + (item.played ? formatTime(item.played) : '0:00');
 
-  meta.append(title, tagRow, details);
+  details.append(len, res, fps, size, date, played);
+  meta.append(title, tags, details);
 
-  // clicking opens popup player only (no inline play)
-  const openPlayer = (e)=>{
+  // click behavior open in player overlay
+  function openIt(e){
     e.stopPropagation();
     openInPlayer(idx);
-  };
-  thumbWrap.addEventListener('click', openPlayer);
-  meta.addEventListener('click', openPlayer);
+  }
+  thumbWrap.addEventListener('click', openIt);
+  meta.addEventListener('click', openIt);
 
   card.appendChild(thumbWrap);
   card.appendChild(meta);
-  card.style.opacity = 0; setTimeout(()=>{ card.style.opacity = 1; }, 40);
+
+  // store references for progress updates
+  item._elements = {card, innerBar, playedEl: played, durBadge, thumbImg: img};
+
   return card;
 }
 
@@ -312,212 +307,255 @@ function buildCard(item, idx){
 function renderGallery(){
   galleryEl.innerHTML = '';
   const filter = typeFilter.value;
-  let toShow = allFiles.filter(it => (filter === 'all' ? true : it.file.type.startsWith(filter)));
+  // filter
+  filteredFiles = allFiles.filter(it => (filter === 'all' ? true : it.file.type.startsWith(filter)));
+  // sort
   const sortBy = sortSelect.value;
-
-  toShow.sort((a,b)=>{
-    if(sortBy === 'title') return a.file.name.localeCompare(b.file.name);
-    if(sortBy === 'type') return a.file.type.localeCompare(b.file.type);
-    if(sortBy === 'date') return a.file.lastModified - b.file.lastModified;
-    if(sortBy === 'size') return a.file.size - b.file.size;
-    if(sortBy === 'length'){
-      const da = a.metadata.duration || 0, db = b.metadata.duration || 0; return da - db;
-    }
+  filteredFiles.sort((a,b)=>{
+    if(sortBy==='title') return a.file.name.localeCompare(b.file.name);
+    if(sortBy==='type') return a.file.type.localeCompare(b.file.type);
+    if(sortBy==='date') return a.file.lastModified - b.file.lastModified;
+    if(sortBy==='size') return a.file.size - b.file.size;
+    if(sortBy==='length'){ const da=a.metadata.duration||0, db=b.metadata.duration||0; return da-db; }
+    if(sortBy==='resolution'){ const ra=(a.metadata.width||0)*(a.metadata.height||0), rb=(b.metadata.width||0)*(b.metadata.height||0); return rb-ra; }
     return 0;
   });
 
   galleryEl.classList.toggle('list', isListView);
-  toShow.forEach((it, idx) => {
+  viewIndicator.textContent = isListView ? '📋' : '🔲';
+
+  filteredFiles.forEach((it, idx)=>{
     const card = buildCard(it, idx);
     if(isListView) card.classList.add('row');
     galleryEl.appendChild(card);
   });
 }
 
-/* ---------- Open item in overlay player ---------- */
-function openInPlayer(index){
-  const item = allFiles[index];
-  if(!item) return;
-  player.pause(); audioPlayer.pause();
-  player.removeAttribute('src'); audioPlayer.removeAttribute('src');
-  const url = item.url;
+/* ---------- Open in native player overlay ---------- */
+function openInPlayer(filteredIndex){
+  // map filteredIndex to allFiles index
+  const item = filteredFiles[filteredIndex];
+  const index = allFiles.indexOf(item);
+  if(index < 0) return;
+  currentIndex = index;
   const isVideo = item.file.type.startsWith('video/');
+  // reset players
+  videoPlayer.pause(); audioPlayer.pause();
+  videoPlayer.removeAttribute('src'); audioPlayer.removeAttribute('src');
+  playerMeta.textContent = '';
+
   playerContainer.style.display = 'flex';
-  playerContainer.setAttribute('aria-hidden','false');
 
   if(isVideo){
     audioPlayer.style.display = 'none';
-    player.style.display = 'block';
-    player.src = url;
-    const start = loadPlayedPosition(item.file) || item.playedSeconds || 0;
-    try{ player.currentTime = start; }catch(e){}
-    player.play().catch(()=>{ /* may be blocked until user interacts but popup click is gesture */});
-    player.ontimeupdate = ()=> {
-      item.playedSeconds = player.currentTime;
-      savePlayedPosition(item.file, player.currentTime);
-      updateWatchedBar(item);
+    videoPlayer.style.display = 'block';
+    videoPlayer.src = item.url;
+    videoPlayer.currentTime = item.played || 0;
+    playerMeta.textContent = `${item.file.name} • ${item.metadata.width ? item.metadata.width+'x'+item.metadata.height : 'Res: —'} • ${formatBytes(item.file.size)}`;
+    // update played time to item while playing
+    videoPlayer.ontimeupdate = ()=>{
+      item.played = videoPlayer.currentTime;
+      if(item._elements){ item._elements.playedEl.textContent = 'Played: ' + formatTime(item.played);
+                        const pct = (item.metadata.duration? (item.played / item.metadata.duration * 100) : 0);
+                        item._elements.innerBar.style.width = Math.min(100, pct) + '%'; }
     };
-    player.onended = ()=>{ item.playedSeconds = item.metadata.duration || 0; savePlayedPosition(item.file, item.playedSeconds); updateWatchedBar(item); };
-    playerMeta.textContent = `${item.file.name} • ${item.file.size ? formatBytes(item.file.size) : ''}`;
+    videoPlayer.onended = ()=> onEnded();
+    videoPlayer.play().catch(()=>{ /* autoplay blocked until user interacts */});
   } else {
-    player.style.display = 'none';
+    videoPlayer.style.display = 'none';
     audioPlayer.style.display = 'block';
-    audioPlayer.src = url;
-    const start = loadPlayedPosition(item.file) || item.playedSeconds || 0;
-    try{ audioPlayer.currentTime = start; }catch(e){}
-    audioPlayer.play().catch(()=>{ /* may require user gesture */});
-    audioPlayer.ontimeupdate = ()=> {
-      item.playedSeconds = audioPlayer.currentTime;
-      savePlayedPosition(item.file, audioPlayer.currentTime);
-      updateWatchedBar(item);
+    audioPlayer.src = item.url;
+    audioPlayer.currentTime = item.played || 0;
+    playerMeta.textContent = `${item.file.name} • Audio • ${formatBytes(item.file.size)}`;
+    // show waveform when playing
+    audioPlayer.ontimeupdate = ()=>{
+      item.played = audioPlayer.currentTime;
+      if(item._elements){ item._elements.playedEl.textContent = 'Played: ' + formatTime(item.played);
+                        const pct = (item.metadata.duration? (item.played / item.metadata.duration * 100) : 0);
+                        item._elements.innerBar.style.width = Math.min(100, pct) + '%'; }
     };
-    audioPlayer.onended = ()=>{ item.playedSeconds = item.metadata.duration || 0; savePlayedPosition(item.file, item.playedSeconds); updateWatchedBar(item); };
-    playerMeta.textContent = `${item.file.name} • Audio • ${item.file.size ? formatBytes(item.file.size) : ''}`;
+    audioPlayer.onended = ()=> onEnded();
+    audioPlayer.play().then(()=>{}).catch(()=>{});
   }
+  updatePlayButton();
+  updateWave(true, item.file.type.startsWith('audio/'));
 }
 
-/* ---------- Update watched bar for a single item ---------- */
-function updateWatchedBar(item){
-  // find its card in DOM by matching filename; quicker approach would use dataset keys
-  const cards = Array.from(galleryEl.querySelectorAll('.card'));
-  for(const card of cards){
-    const title = card.querySelector('.meta h3');
-    if(title && title.textContent === item.file.name){
-      const bar = card.querySelector('.watched-bar');
-      if(bar && item.metadata.duration){
-        const pct = Math.min(100, ((item.playedSeconds || 0) / item.metadata.duration) * 100);
-        bar.style.width = pct + '%';
-      }
-      const playedEl = card.querySelector('.detail-row div:nth-child(3)');
-      if(playedEl) playedEl.textContent = 'Played: ' + (item.playedSeconds? formatTime(item.playedSeconds) : '0:00');
-      break;
-    }
+/* ---------- Controls below behavior (prev/next/autoplay/shuffle) ---------- */
+prevBtn.addEventListener('click', ()=>{
+  if(allFiles.length===0) return;
+  if(shuffleOn){
+    currentIndex = Math.floor(Math.random()*allFiles.length);
+  } else {
+    currentIndex = (currentIndex - 1 + allFiles.length) % allFiles.length;
   }
+  openInPlayer(getFilteredIndexFromAll(currentIndex));
+});
+
+nextBtn.addEventListener('click', ()=>{ playNext(); });
+
+function playNext(){
+  if(allFiles.length===0) return;
+  if(shuffleOn){
+    currentIndex = Math.floor(Math.random()*allFiles.length);
+  } else {
+    currentIndex = (currentIndex + 1) % allFiles.length;
+  }
+  openInPlayer(getFilteredIndexFromAll(currentIndex));
 }
 
-/* ---------- Input handlers & ingestion ---------- */
-fileInput.addEventListener('change', async (e)=>{
-  const files = Array.from(e.target.files || []);
-  await ingestFiles(files);
+function onEnded(){
+  if(autoplayNext) { playNext(); }
+  else { updatePlayButton(); updateWave(false); }
+}
+
+playToggle.addEventListener('click', ()=>{
+  const current = allFiles[currentIndex];
+  if(!current) return;
+  if(current.file.type.startsWith('video/')){
+    if(videoPlayer.paused) videoPlayer.play(); else videoPlayer.pause();
+  } else {
+    if(audioPlayer.paused) audioPlayer.play(); else audioPlayer.pause();
+  }
+  updatePlayButton();
 });
-folderInput.addEventListener('change', async (e)=>{
-  const files = Array.from(e.target.files || []);
-  await ingestFiles(files);
+
+autoplayBtn.addEventListener('click', ()=>{
+  autoplayNext = !autoplayNext;
+  autoplayBtn.textContent = 'Autoplay: ' + (autoplayNext? 'On' : 'Off');
+  autoplayBtn.classList.toggle('toggled', autoplayNext);
 });
+
+shuffleBtn.addEventListener('click', ()=>{
+  shuffleOn = !shuffleOn;
+  shuffleBtn.textContent = 'Shuffle: ' + (shuffleOn? 'On' : 'Off');
+  shuffleBtn.classList.toggle('toggled', shuffleOn);
+});
+
+function updatePlayButton(){
+  const cur = allFiles[currentIndex];
+  if(!cur){ playToggle.textContent = 'Play/Pause'; return; }
+  const playing = (cur.file.type.startsWith('video/') ? !videoPlayer.paused : !audioPlayer.paused);
+  playToggle.textContent = playing ? 'Pause' : 'Play';
+  updateWave(playing, cur.file.type.startsWith('audio/'));
+}
+
+/* ---------- Waveform animation control ---------- */
+function updateWave(isPlaying, isAudio){
+  if(isPlaying && isAudio){ waveBars.classList.add('playing'); waveBars.style.opacity = 1; }
+  else if(isPlaying && !isAudio){ waveBars.classList.remove('playing'); waveBars.style.opacity = 0.6; }
+  else { waveBars.classList.remove('playing'); waveBars.style.opacity = 0.35; }
+}
+
+/* ---------- Utility: map allFiles index -> filteredFiles index ---------- */
+function getFilteredIndexFromAll(allIdx){
+  const item = allFiles[allIdx];
+  return filteredFiles.indexOf(item);
+}
+
+/* ---------- Event handlers: inputs ---------- */
+fileInput.addEventListener('change', async (e)=>{ const files = Array.from(e.target.files||[]); await ingestFiles(files); });
+folderInput.addEventListener('change', async (e)=>{ const files = Array.from(e.target.files||[]); await ingestFiles(files); });
 
 typeFilter.addEventListener('change', renderGallery);
 sortSelect.addEventListener('change', renderGallery);
 
-/* view/theme toggles */
 viewToggle.addEventListener('click', ()=>{
   isListView = !isListView;
   viewToggle.textContent = isListView ? '📋 List' : '🔲 Grid';
-  viewIndicator.querySelector('.icon').textContent = isListView ? '📋' : '🔲';
+  viewIndicator.textContent = isListView ? '📋' : '🔲';
   renderGallery();
 });
 themeToggle.addEventListener('click', ()=>{
   isLight = !isLight;
   document.body.classList.toggle('light', isLight);
   themeToggle.textContent = isLight ? '☀️ Light' : '🌙 Dark';
-  themeIndicator.querySelector('.icon').textContent = isLight ? '☀️' : '🌙';
+  themeIndicator.textContent = isLight ? '☀️' : '🌙';
 });
 
-/* player close */
-closeBtn.addEventListener('click', ()=>{
-  try{ player.pause(); audioPlayer.pause(); }catch(e){}
-  playerContainer.style.display = 'none';
-});
+/* ---------- Close overlay ---------- */
+closeBtn.addEventListener('click', ()=>{ try{ videoPlayer.pause(); audioPlayer.pause(); }catch(e){} playerContainer.style.display='none'; updateWave(false); });
 
-/* ---------- Ingest files (metadata + thumbnail) ---------- */
-async function ingestFiles(fileList){
-  for(const f of fileList){
-    if(!f.type || (!f.type.startsWith('video/') && !f.type.startsWith('audio/'))) continue;
-    // skip if already exists (by fingerprint)
-    const key = fileKey(f);
-    if(allFiles.some(x=>fileKey(x.file)===key)) continue;
-
+/* ---------- Ingest files, metadata, thumbnails ---------- */
+async function ingestFiles(list){
+  // iterate and process
+  for(const f of list){
+    if(!f.type) continue;
+    if(!(f.type.startsWith('video/') || f.type.startsWith('audio/'))) continue;
     const url = URL.createObjectURL(f);
-    const entry = { file: f, url: url, metadata: {}, thumbUrl: null, playedSeconds: loadPlayedPosition(f) || 0 };
-
-    // populate small metadata quickly
+    const entry = { file: f, url, metadata:{}, thumbUrl:null, played:0 };
+    // quick meta
     entry.metadata.size = f.size;
     entry.metadata.date = f.lastModified;
 
     if(f.type.startsWith('video/')){
+      // capture thumbnail at 1/4
       try{
-        const {thumb, width, height, duration} = await captureThumbnail(url);
-        entry.thumbUrl = thumb;
-        entry.metadata.width = width;
-        entry.metadata.height = height;
-        entry.metadata.duration = duration || 0;
-      }catch(e){
-        entry.thumbUrl = null;
-        entry.metadata.duration = 0;
-      }
-      // try FPS best-effort (optional, but we are removing display)
-      entry.metadata.fps = await estimateFPS(url, entry.metadata.duration).catch(()=> 'Unknown');
+        const t = await captureThumbnail(url);
+        entry.thumbUrl = t.thumb;
+        entry.metadata.width = t.w || 0;
+        entry.metadata.height = t.h || 0;
+      }catch(e){ entry.thumbUrl = null; }
+
+      // load metadata for duration
+      try{
+        const v = document.createElement('video'); v.preload='metadata'; v.muted=true; v.src = url;
+        await new Promise((res)=>{ v.addEventListener('loadedmetadata', ()=>res(), {once:true}); v.addEventListener('error', ()=>res(), {once:true}); });
+        entry.metadata.duration = v.duration || 0;
+        // fps estimate
+        entry.metadata.fps = await estimateFPS(url, entry.metadata.duration);
+      }catch(e){ entry.metadata.duration = 0; entry.metadata.fps='Unknown'; }
     } else {
-      // audio
-      const a = document.createElement('audio'); a.preload='metadata'; a.src = url;
-      await new Promise((res)=>{ a.addEventListener('loadedmetadata', ()=>res(), {once:true}); a.addEventListener('error', ()=>res(), {once:true}); });
-      entry.metadata.duration = a.duration || 0;
-      entry.thumbUrl = null;
+      // audio metadata
+      try{
+        const a = document.createElement('audio'); a.preload='metadata'; a.src = url;
+        await new Promise((res)=>{ a.addEventListener('loadedmetadata', ()=>res(), {once:true}); a.addEventListener('error', ()=>res(), {once:true}); });
+        entry.metadata.duration = a.duration || 0;
+      }catch(e){ entry.metadata.duration = 0; }
+      // audio thumbnail stays null (shows note icon)
     }
 
     allFiles.push(entry);
-    renderGallery();
   }
+  // after ingest, render
+  renderGallery();
 }
 
-/* ---------- estimateFPS helper used earlier ---------- */
-async function estimateFPS(fileUrl, duration){
-  return new Promise((resolve)=>{
-    try{
-      const v = document.createElement('video');
-      v.preload='metadata';
-      v.muted=true;
-      v.src = fileUrl;
-      v.addEventListener('loadedmetadata', ()=>{
-        const tryMeasure = ()=>{
-          try{
-            if(typeof v.getVideoPlaybackQuality === 'function'){
-              const q = v.getVideoPlaybackQuality();
-              if(q && q.totalVideoFrames && duration > 0){ const fps = Math.round(q.totalVideoFrames / duration); resolve(fps || 'Unknown'); v.src=''; return; }
-            }
-            const frames = v.webkitDecodedFrameCount || v.mozPaintCount || 0;
-            if(frames && duration>0){ resolve(Math.round(frames/duration) || 'Unknown'); v.src=''; return; }
-            resolve('Unknown'); v.src='';
-          }catch(e){ resolve('Unknown'); v.src=''; }
-        };
-        v.play().then(()=>{ setTimeout(()=>{ v.pause(); tryMeasure(); }, 300); }).catch(()=>{ tryMeasure(); });
-      });
-      v.addEventListener('error', ()=>resolve('Unknown'));
-    }catch(e){ resolve('Unknown'); }
+/* ---------- Periodic UI sync (update progress bars) ---------- */
+setInterval(()=>{
+  allFiles.forEach(it=>{
+    if(it._elements){
+      const played = it.played || 0;
+      const dur = it.metadata.duration || 0;
+      const pct = dur ? Math.min(100, (played/dur)*100) : 0;
+      it._elements.innerBar.style.width = pct + '%';
+      it._elements.playedEl && (it._elements.playedEl.textContent = 'Played: ' + (played? formatTime(played) : '0:00'));
+      it._elements.durBadge && (it._elements.durBadge.textContent = dur? formatTime(dur) : '00:00');
+    }
   });
-}
+}, 800);
 
-/* ---------- Update watched bars initially from saved positions ---------- */
-function applySavedPositions(){
-  for(const it of allFiles){
-    const saved = loadPlayedPosition(it.file);
-    if(saved) it.playedSeconds = saved;
+/* ---------- Next on end / autoplay handled earlier ---------- */
+/* ---------- keyboard support ---------- */
+document.addEventListener('keydown', (e)=>{
+  if(playerContainer.style.display==='flex'){
+    if(e.key === 'ArrowRight') playNext();
+    if(e.key === 'ArrowLeft') { prevBtn.click(); }
+    if(e.key === ' ') { e.preventDefault(); playToggle.click(); }
+    if(e.key === 'Escape') closeBtn.click();
   }
-}
-
-/* ---------- Cleanup on unload ---------- */
-window.addEventListener('beforeunload', ()=>{
-  allFiles.forEach(it => { try{ URL.revokeObjectURL(it.url); }catch(e){} });
 });
 
-/* ---------- Keyboard accessibility ---------- */
-document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ if(playerContainer.style.display === 'flex') closeBtn.click(); } });
+/* ---------- Preserve object URLs cleanup ---------- */
+window.addEventListener('beforeunload', ()=>{ allFiles.forEach(it=>{ try{ URL.revokeObjectURL(it.url);}catch(e){} }); });
 
-/* init */
+/* ---------- Init labels ---------- */
 (function init(){
   viewToggle.textContent = '🔲 Grid';
   themeToggle.textContent = '🌙 Dark';
-  themeIndicator.querySelector('.icon').textContent = '🌙';
-  viewIndicator.querySelector('.icon').textContent = '🔲';
+  themeIndicator.textContent = '🌙';
+  viewIndicator.textContent = '🔲';
+  waveBars.style.opacity = 0.35;
 })();
 </script>
 </body>
