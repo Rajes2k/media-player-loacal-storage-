@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: rajes-media-player
+    name: rajes-player
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
