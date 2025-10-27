@@ -1,6 +1,8 @@
 Flask==3.0.3
 moviepy==1.0.3
-imageio[ffmpeg]==2.34.0
-opencv-python==4.9.0.80
-Pillow==10.2.0
+imageio==2.34.0
+imageio-ffmpeg==0.5.1
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+Pillow==10.3.0
 gunicorn==21.2.0
