@@ -1,156 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Rajes Media Player</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d1117;
-      color: white;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    h1 {
-      color: #00bcd4;
-      margin-top: 20px;
-    }
-    .controls {
-      margin: 20px;
-    }
-    input[type="file"] {
-      display: none;
-    }
-    label {
-      background: #00bcd4;
-      color: white;
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-      padding: 20px;
-    }
-    .thumb {
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #1c1c1c;
-      cursor: pointer;
-    }
-    .thumb video {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-    }
-    .thumb span {
-      position: absolute;
-      bottom: 5px;
-      left: 5px;
-      background: rgba(0,0,0,0.7);
-      padding: 2px 5px;
-      font-size: 12px;
-      border-radius: 4px;
-    }
-    #player-container {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: black;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-    #player {
-      width: 90%;
-      height: auto;
-      max-height: 90%;
-    }
-    #close {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 25px;
-      cursor: pointer;
-      color: white;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>🎬 Rajes Media Player</title>
+<style>
+body {
+  background-color: #0e0e0e;
+  color: #fff;
+  font-family: Arial;
+  margin: 0;
+  padding: 20px;
+}
+h1 { color: #ff9800; }
+.upload-section {
+  margin-bottom: 20px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+.card {
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: 0.3s;
+}
+.card:hover {
+  transform: scale(1.05);
+}
+.thumb {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+.details {
+  text-align: center;
+  padding: 8px;
+}
+.title {
+  font-weight: bold;
+  font-size: 14px;
+}
+.duration {
+  font-size: 12px;
+  color: #bbb;
+}
+video {
+  width: 80%;
+  margin: 20px auto;
+  display: block;
+  border-radius: 10px;
+}
+</style>
 </head>
 <body>
-  <h1>🎬 Rajes Media Player</h1>
-  <div class="controls">
-    <label for="fileInput">🎞️ Select Files</label>
-    <input type="file" id="fileInput" accept="video/*" multiple>
 
-    <label for="folderInput">📁 Select Folder</label>
-    <input type="file" id="folderInput" accept="video/*" webkitdirectory>
+<h1>🎬 Rajes Media Player (Render Version)</h1>
+
+<div class="upload-section">
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Upload</button>
+  </form>
+</div>
+
+<div class="grid">
+  {% for v in videos %}
+  <div class="card" onclick="play('{{v.path}}')">
+    <img class="thumb" src="/thumbnail/{{v.path}}">
+    <div class="details">
+      <div class="title">{{v.name}}</div>
+      <div class="duration">{{v.duration}}</div>
+    </div>
   </div>
+  {% endfor %}
+</div>
 
-  <div class="gallery" id="gallery"></div>
+<video id="player" controls></video>
 
-  <div id="player-container">
-    <span id="close">✖</span>
-    <video id="player" controls></video>
-  </div>
+<script>
+function play(filename) {
+  const player = document.getElementById('player');
+  player.src = '/play/' + filename;
+  player.scrollIntoView({ behavior: 'smooth' });
+  player.play();
+}
+</script>
 
-  <script>
-    const gallery = document.getElementById('gallery');
-    const playerContainer = document.getElementById('player-container');
-    const player = document.getElementById('player');
-    const closeBtn = document.getElementById('close');
-
-    closeBtn.onclick = () => {
-      player.pause();
-      playerContainer.style.display = 'none';
-    };
-
-    function showVideos(files) {
-      gallery.innerHTML = '';
-      [...files].forEach(file => {
-        if (!file.type.startsWith('video/')) return;
-
-        const url = URL.createObjectURL(file);
-        const div = document.createElement('div');
-        div.className = 'thumb';
-
-        const video = document.createElement('video');
-        video.src = url;
-        video.muted = true;
-        video.preload = 'metadata';
-        video.addEventListener('loadedmetadata', () => {
-          const duration = Math.floor(video.duration);
-          const mins = Math.floor(duration / 60);
-          const secs = duration % 60;
-          const label = document.createElement('span');
-          label.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
-          div.appendChild(label);
-        });
-
-        div.onclick = () => {
-          player.src = url;
-          playerContainer.style.display = 'flex';
-          player.play();
-        };
-
-        div.appendChild(video);
-        gallery.appendChild(div);
-      });
-    }
-
-    document.getElementById('fileInput').addEventListener('change', e => {
-      showVideos(e.target.files);
-    });
-
-    document.getElementById('folderInput').addEventListener('change', e => {
-      showVideos(e.target.files);
-    });
-  </script>
 </body>
 </html>
