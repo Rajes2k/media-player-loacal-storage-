@@ -1,6 +1,7 @@
 import os
 import mimetypes
-from flask import Flask, render_template, request, jsonify, Response, send_file, abort, safe_join
+from flask import Flask, render_template, request, jsonify, Response, send_file, abort
+from werkzeug.utils import safe_join
 from pathlib import Path
 
 APP_ROOT = Path(__file__).parent.resolve()
