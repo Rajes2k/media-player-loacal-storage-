@@ -1,199 +1,156 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Media Player — Thumbnails & Play</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Rajes Media Player</title>
   <style>
-    :root {
-      --bg: #0d1117;
-      --panel: #0f1620;
-      --accent: #00c3ff;
-      --muted: #9aa6b2;
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: white;
+      margin: 0;
+      padding: 0;
+      text-align: center;
     }
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#e6eef6;padding:18px;}
-    .wrap{max-width:1100px;margin:0 auto;}
-    header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    h1{margin:0;color:var(--accent)}
-    .controls{display:flex;gap:8px;align-items:center}
-    .btn{background:var(--accent);color:#021018;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:18px}
-    .card{background:#11151a;border-radius:10px;overflow:hidden;padding-bottom:8px}
-    .thumb{width:100%;height:120px;object-fit:cover;background:#000;display:block}
-    .meta{padding:8px;text-align:center}
-    .title{font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sub{font-size:12px;color:var(--muted);margin-top:6px}
-    #playerWrap{margin-top:20px;background:var(--panel);padding:12px;border-radius:10px}
-    video{width:100%;max-height:540px;border-radius:8px;background:black;display:block}
-    .infoRow{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted)}
-    input[type=file]{display:none}
-    label.filebtn{display:inline-block;background:#00c3ff;color:#021018;padding:8px 12px;border-radius:8px;cursor:pointer}
+    h1 {
+      color: #00bcd4;
+      margin-top: 20px;
+    }
+    .controls {
+      margin: 20px;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    label {
+      background: #00bcd4;
+      color: white;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+    .thumb {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #1c1c1c;
+      cursor: pointer;
+    }
+    .thumb video {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+    .thumb span {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      background: rgba(0,0,0,0.7);
+      padding: 2px 5px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    #player-container {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    #player {
+      width: 90%;
+      height: auto;
+      max-height: 90%;
+    }
+    #close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 25px;
+      cursor: pointer;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>🎬 Rajes Media Player</h1>
-      <div class="controls">
-        <label class="filebtn">Upload
-          <input id="fileInput" type="file" accept="video/*,audio/*" />
-        </label>
-        <button class="btn" id="refreshBtn">Refresh List</button>
-      </div>
-    </header>
+  <h1>🎬 Rajes Media Player</h1>
+  <div class="controls">
+    <label for="fileInput">🎞️ Select Files</label>
+    <input type="file" id="fileInput" accept="video/*" multiple>
 
-    <div id="status" class="infoRow" style="margin-top:10px">
-      <div id="rootInfo">Files in uploads/</div>
-      <div id="countInfo">0 files</div>
-    </div>
-
-    <div class="grid" id="grid"></div>
-
-    <div id="playerWrap">
-      <div style="font-weight:600" id="nowPlaying">No file selected</div>
-      <video id="player" controls preload="metadata"></video>
-      <div class="infoRow">
-        <div id="fileMeta" class="sub">—</div>
-        <div id="timeMeta" class="sub">00:00 / 00:00</div>
-      </div>
-    </div>
+    <label for="folderInput">📁 Select Folder</label>
+    <input type="file" id="folderInput" accept="video/*" webkitdirectory>
   </div>
 
-<script>
-const grid = document.getElementById('grid');
-const status = document.getElementById('rootInfo');
-const countInfo = document.getElementById('countInfo');
-const player = document.getElementById('player');
-const nowPlaying = document.getElementById('nowPlaying');
-const fileMeta = document.getElementById('fileMeta');
-const timeMeta = document.getElementById('timeMeta');
-const refreshBtn = document.getElementById('refreshBtn');
-const fileInput = document.getElementById('fileInput');
+  <div class="gallery" id="gallery"></div>
 
-async function fetchList(){
-  const res = await fetch('/api/list');
-  if (!res.ok) { grid.innerHTML='<div style="padding:10px">Error loading files</div>'; return; }
-  const list = await res.json();
-  status.textContent = 'Files in uploads/';
-  countInfo.textContent = list.length + ' files';
-  renderGrid(list);
-}
+  <div id="player-container">
+    <span id="close">✖</span>
+    <video id="player" controls></video>
+  </div>
 
-function renderGrid(list){
-  grid.innerHTML = '';
-  if (!list.length){ grid.innerHTML = '<div style="padding:10px">No uploaded videos yet. Upload using the Upload button.</div>'; return; }
-  for (const item of list){
-    const card = document.createElement('div');
-    card.className = 'card';
-    const thumb = document.createElement('img');
-    thumb.className = 'thumb';
-    thumb.alt = item.name;
-    // placeholder until we generate
-    thumb.src = '/static/placeholder.png';
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.innerHTML = `<div class="title" title="${item.name}">${item.name}</div><div class="sub" id="sub-${encodeURIComponent(item.name)}">loading...</div>`;
-    card.appendChild(thumb);
-    card.appendChild(meta);
-    card.addEventListener('click', ()=> playFile(item.name));
-    grid.appendChild(card);
+  <script>
+    const gallery = document.getElementById('gallery');
+    const playerContainer = document.getElementById('player-container');
+    const player = document.getElementById('player');
+    const closeBtn = document.getElementById('close');
 
-    // generate thumbnail and duration in background (client-side)
-    generateThumbAndDuration(item.name, thumb, document.getElementById(`sub-${encodeURIComponent(item.name)}`));
-  }
-}
+    closeBtn.onclick = () => {
+      player.pause();
+      playerContainer.style.display = 'none';
+    };
 
-async function generateThumbAndDuration(filename, imgEl, infoEl){
-  const url = '/uploads/' + encodeURIComponent(filename);
-  try {
-    // create offscreen video element
-    const vid = document.createElement('video');
-    vid.preload = 'metadata';
-    vid.muted = true;
-    vid.crossOrigin = "anonymous";
-    vid.src = url;
-    // Wait for metadata to load to read duration and video dims
-    await new Promise((resolve, reject) => {
-      const t = setTimeout(()=> reject('metadata timeout'), 8000);
-      vid.addEventListener('loadedmetadata', ()=>{ clearTimeout(t); resolve(); }, {once:true});
-      vid.addEventListener('error', (e)=>{ clearTimeout(t); reject(e); }, {once:true});
-    });
+    function showVideos(files) {
+      gallery.innerHTML = '';
+      [...files].forEach(file => {
+        if (!file.type.startsWith('video/')) return;
 
-    // set duration text
-    const dur = vid.duration;
-    const durText = formatTime(dur);
-    infoEl.textContent = durText;
+        const url = URL.createObjectURL(file);
+        const div = document.createElement('div');
+        div.className = 'thumb';
 
-    // choose capture time: a small offset but less than duration
-    const captureTime = Math.min(1, Math.max(0.1, dur * 0.05));
+        const video = document.createElement('video');
+        video.src = url;
+        video.muted = true;
+        video.preload = 'metadata';
+        video.addEventListener('loadedmetadata', () => {
+          const duration = Math.floor(video.duration);
+          const mins = Math.floor(duration / 60);
+          const secs = duration % 60;
+          const label = document.createElement('span');
+          label.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+          div.appendChild(label);
+        });
 
-    // seek to captureTime
-    vid.currentTime = captureTime;
+        div.onclick = () => {
+          player.src = url;
+          playerContainer.style.display = 'flex';
+          player.play();
+        };
 
-    await new Promise((resolve, reject) => {
-      const t = setTimeout(()=> reject('seek timeout'), 8000);
-      vid.addEventListener('seeked', ()=>{ clearTimeout(t); resolve(); }, {once:true});
-      vid.addEventListener('error', (e)=>{ clearTimeout(t); reject(e); }, {once:true});
-    });
-
-    // draw frame to canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = vid.videoWidth || 320;
-    canvas.height = vid.videoHeight || 180;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
-    // create data url
-    imgEl.src = canvas.toDataURL('image/jpeg', 0.7);
-    // cleanup
-    vid.remove();
-  } catch (err) {
-    console.warn('thumb generation failed for', filename, err);
-    infoEl.textContent = '—';
-  }
-}
-
-function formatTime(seconds){
-  if (!isFinite(seconds) || isNaN(seconds)) return '00:00';
-  const m = Math.floor(seconds/60), s = Math.floor(seconds%60);
-  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-}
-
-async function playFile(name){
-  const url = '/uploads/' + encodeURIComponent(name);
-  player.src = url;
-  nowPlaying.textContent = name;
-  fileMeta.textContent = '';
-  timeMeta.textContent = '00:00 / 00:00';
-  player.play().catch(()=>{});
-  // update time info
-  player.onloadedmetadata = ()=> { timeMeta.textContent = formatTime(player.currentTime) + ' / ' + formatTime(player.duration); }
-  player.ontimeupdate = ()=> { timeMeta.textContent = formatTime(player.currentTime) + ' / ' + formatTime(player.duration); }
-}
-
-refreshBtn.addEventListener('click', fetchList);
-
-fileInput.addEventListener('change', async (ev) => {
-  const f = ev.target.files[0];
-  if (!f) return;
-  const form = new FormData();
-  form.append('file', f);
-  try {
-    const r = await fetch('/upload', { method: 'POST', body: form });
-    if (r.ok) {
-      alert('Uploaded');
-      fileInput.value = '';
-      fetchList();
-    } else {
-      alert('Upload failed');
+        div.appendChild(video);
+        gallery.appendChild(div);
+      });
     }
-  } catch (err) {
-    alert('Upload error');
-    console.error(err);
-  }
-});
 
-// initial load
-fetchList();
-</script>
+    document.getElementById('fileInput').addEventListener('change', e => {
+      showVideos(e.target.files);
+    });
+
+    document.getElementById('folderInput').addEventListener('change', e => {
+      showVideos(e.target.files);
+    });
+  </script>
 </body>
 </html>
