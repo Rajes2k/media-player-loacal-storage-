@@ -2,3 +2,5 @@ flask
 moviepy
 pillow
 gunicorn
+opencv-python
+imageio[ffmpeg]
