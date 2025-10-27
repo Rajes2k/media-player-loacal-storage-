@@ -5,139 +5,127 @@
   <title>🎬 Rajes Media Player</title>
   <style>
     :root {
-      --bg-color: #0d1117;
-      --text-color: #ffffff;
-      --accent-color: #00bcd4;
-      --card-bg: #1c1c1c;
-      --hover-scale: 1.05;
-    }
-
-    body.light {
-      --bg-color: #f3f4f6;
-      --text-color: #111827;
-      --accent-color: #007bff;
-      --card-bg: #ffffff;
+      --bg-dark: #0d1117;
+      --bg-light: #f5f5f5;
+      --text-dark: #ffffff;
+      --text-light: #000000;
+      --accent: #00bcd4;
+      --card-bg-dark: #1c1c1c;
+      --card-bg-light: #ffffff;
     }
 
     body {
-      font-family: "Poppins", Arial, sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-dark);
       margin: 0;
       padding: 0;
-      text-align: center;
-      transition: background 0.4s, color 0.4s;
+      transition: all 0.3s ease-in-out;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 25px;
-      background: var(--card-bg);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    body.light {
+      background: var(--bg-light);
+      color: var(--text-light);
     }
 
     h1 {
-      color: var(--accent-color);
-      margin: 0;
-      font-size: 1.6rem;
+      text-align: center;
+      margin-top: 15px;
+      color: var(--accent);
+    }
+
+    .top-controls {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px;
     }
 
-    .theme-toggle {
-      cursor: pointer;
-      background: var(--accent-color);
-      color: #fff;
+    label, select, button {
+      background: var(--accent);
+      color: white;
+      padding: 10px 15px;
       border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
+      border-radius: 8px;
+      cursor: pointer;
       font-weight: bold;
-      transition: background 0.3s;
-    }
-    .theme-toggle:hover {
-      background: #0095a8;
+      transition: 0.3s;
     }
 
-    .controls {
-      margin: 25px;
+    label:hover, select:hover, button:hover {
+      transform: scale(1.05);
+      background: #02c8e6;
     }
 
     input[type="file"] {
       display: none;
     }
 
-    label {
-      background: var(--accent-color);
-      color: white;
-      padding: 12px 25px;
-      margin: 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.2s;
+    #themeToggle {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 8px;
     }
 
-    label:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px var(--accent-color);
+    #viewToggle {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 8px;
     }
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
       padding: 20px;
+      transition: all 0.3s;
+    }
+
+    .gallery.list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .thumb {
-      position: relative;
-      border-radius: 12px;
+      background: var(--card-bg-dark);
+      border-radius: 10px;
       overflow: hidden;
-      background: var(--card-bg);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    body.light .thumb {
+      background: var(--card-bg-light);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     .thumb:hover {
-      transform: scale(var(--hover-scale));
-      box-shadow: 0 0 15px var(--accent-color);
+      transform: translateY(-6px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
     }
 
-    .thumb video {
+    video, audio {
       width: 100%;
-      height: 140px;
-      object-fit: cover;
-      display: block;
+      height: auto;
+      border-bottom: 1px solid #333;
     }
 
-    .thumb span {
-      position: absolute;
-      bottom: 8px;
-      left: 8px;
-      background: rgba(0,0,0,0.7);
-      padding: 3px 6px;
-      font-size: 12px;
-      border-radius: 4px;
-    }
-
-    .file-name {
-      font-size: 14px;
-      padding: 8px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      color: var(--text-color);
-    }
-
-    footer {
-      margin-top: 30px;
+    .meta {
       padding: 10px;
-      font-size: 14px;
-      color: #aaa;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .meta strong {
+      color: var(--accent);
     }
 
     #player-container {
@@ -145,117 +133,169 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: black;
+      background: rgba(0,0,0,0.9);
       justify-content: center;
       align-items: center;
       z-index: 999;
     }
 
     #player {
-      width: 95%;
+      width: 90%;
       height: auto;
-      max-height: 95%;
+      max-height: 85%;
     }
 
     #close {
       position: absolute;
-      top: 15px;
-      right: 20px;
+      top: 20px;
+      right: 25px;
       font-size: 25px;
-      cursor: pointer;
       color: white;
+      cursor: pointer;
     }
+
   </style>
 </head>
 <body>
-  <header>
-    <h1>🎬 Rajes Media Player</h1>
-    <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
-  </header>
+  <h1>🎧🎬 Rajes Media Player</h1>
 
-  <div class="controls">
-    <label for="fileInput">🎞️ Select Files</label>
-    <input type="file" id="fileInput" accept="video/*" multiple>
+  <div class="top-controls">
+    <label for="fileInput">📂 Select Files</label>
+    <input type="file" id="fileInput" accept="video/*,audio/*" multiple>
 
     <label for="folderInput">📁 Select Folder</label>
-    <input type="file" id="folderInput" accept="video/*" webkitdirectory>
+    <input type="file" id="folderInput" accept="video/*,audio/*" webkitdirectory>
+
+    <select id="sortSelect">
+      <option value="type">Sort by: Type</option>
+      <option value="title">Title</option>
+      <option value="date">Date</option>
+      <option value="length">Length</option>
+      <option value="size">Size</option>
+      <option value="resolution">Resolution</option>
+    </select>
+
+    <button id="viewToggle">🔲 Grid / List</button>
+    <button id="themeToggle">🌙 Toggle Theme</button>
   </div>
 
   <div class="gallery" id="gallery"></div>
 
   <div id="player-container">
     <span id="close">✖</span>
-    <video id="player" controls autoplay></video>
+    <video id="player" controls></video>
+    <audio id="audioPlayer" controls></audio>
   </div>
-
-  <footer>© 2025 Rajes Media Player | Built with ❤️ using Flask</footer>
 
   <script>
     const gallery = document.getElementById('gallery');
     const playerContainer = document.getElementById('player-container');
-    const player = document.getElementById('player');
+    const videoPlayer = document.getElementById('player');
+    const audioPlayer = document.getElementById('audioPlayer');
     const closeBtn = document.getElementById('close');
     const themeToggle = document.getElementById('themeToggle');
+    const viewToggle = document.getElementById('viewToggle');
+    const sortSelect = document.getElementById('sortSelect');
+
+    let currentTheme = 'dark';
+    let currentView = 'grid';
+    let mediaFiles = [];
 
     // Theme Toggle
-    themeToggle.addEventListener('click', () => {
+    themeToggle.onclick = () => {
       document.body.classList.toggle('light');
-      const isLight = document.body.classList.contains('light');
-      themeToggle.textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
-    });
-
-    closeBtn.onclick = () => {
-      player.pause();
-      playerContainer.style.display = 'none';
-      player.src = '';
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
     };
 
-    function showVideos(files) {
-      gallery.innerHTML = '';
-      [...files].forEach(file => {
-        if (!file.type.startsWith('video/')) return;
+    // View Toggle
+    viewToggle.onclick = () => {
+      gallery.classList.toggle('list');
+      currentView = currentView === 'grid' ? 'list' : 'grid';
+    };
 
+    closeBtn.onclick = () => {
+      videoPlayer.pause();
+      audioPlayer.pause();
+      playerContainer.style.display = 'none';
+    };
+
+    // Sort Function
+    sortSelect.onchange = () => {
+      sortMedia();
+      displayMedia();
+    };
+
+    function sortMedia() {
+      const sortBy = sortSelect.value;
+      mediaFiles.sort((a, b) => {
+        if (sortBy === 'title') return a.name.localeCompare(b.name);
+        if (sortBy === 'type') return a.type.localeCompare(b.type);
+        if (sortBy === 'size') return a.size - b.size;
+        if (sortBy === 'date') return a.lastModified - b.lastModified;
+        return 0;
+      });
+    }
+
+    function formatBytes(bytes) {
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      if (bytes === 0) return '0 B';
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function displayMedia() {
+      gallery.innerHTML = '';
+      mediaFiles.forEach(file => {
         const url = URL.createObjectURL(file);
         const div = document.createElement('div');
         div.className = 'thumb';
 
-        const video = document.createElement('video');
-        video.src = url;
-        video.muted = true;
-        video.preload = 'metadata';
+        const isVideo = file.type.startsWith('video/');
+        const media = document.createElement(isVideo ? 'video' : 'audio');
+        media.src = url;
+        media.preload = 'metadata';
+        media.muted = true;
 
-        video.addEventListener('loadedmetadata', () => {
-          const duration = Math.floor(video.duration);
-          const mins = Math.floor(duration / 60);
-          const secs = duration % 60;
-          const label = document.createElement('span');
-          label.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
-          div.appendChild(label);
-        });
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerHTML = `<strong>${file.name}</strong><br>
+          Type: ${file.type.split('/')[0]}<br>
+          Size: ${formatBytes(file.size)}<br>
+          Path: (Local File)<br>
+          Date: ${new Date(file.lastModified).toLocaleDateString()}`;
 
-        // Show file name
-        const fileName = document.createElement('div');
-        fileName.className = 'file-name';
-        fileName.textContent = file.name;
+        div.appendChild(media);
+        div.appendChild(meta);
 
         div.onclick = () => {
-          player.src = url;
           playerContainer.style.display = 'flex';
-          player.play();
+          if (isVideo) {
+            videoPlayer.src = url;
+            videoPlayer.style.display = 'block';
+            audioPlayer.style.display = 'none';
+            videoPlayer.play();
+          } else {
+            audioPlayer.src = url;
+            audioPlayer.style.display = 'block';
+            videoPlayer.style.display = 'none';
+            audioPlayer.play();
+          }
         };
 
-        div.appendChild(video);
         gallery.appendChild(div);
-        gallery.appendChild(fileName);
       });
     }
 
     document.getElementById('fileInput').addEventListener('change', e => {
-      showVideos(e.target.files);
+      mediaFiles = [...e.target.files];
+      sortMedia();
+      displayMedia();
     });
 
     document.getElementById('folderInput').addEventListener('change', e => {
-      showVideos(e.target.files);
+      mediaFiles = [...e.target.files];
+      sortMedia();
+      displayMedia();
     });
   </script>
 </body>
