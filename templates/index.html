@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajes Media Player</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #00bcd4;
+        }
+        video {
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+            border: 2px solid #00bcd4;
+            border-radius: 10px;
+            background-color: black;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+        input[type="file"] {
+            background: #00bcd4;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="file"]:hover {
+            background: #0097a7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 Rajes Media Player</h1>
+    <input type="file" id="fileInput" accept="video/*">
+    <video id="videoPlayer" controls></video>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                videoPlayer.src = fileURL;
+                videoPlayer.play();
+            }
+        });
+    </script>
+</body>
+</html>
