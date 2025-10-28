@@ -1,242 +1,495 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rajes Media Player</title>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="utf-8" />  
+<meta name="viewport" content="width=device-width,initial-scale=1" />  
+<title>Rajes Media Player</title>  
+<style>  
+  :root{  
+    --bg-dark:#0b0f12;  
+    --panel-dark:#14181b;  
+    --muted-dark:rgba(255,255,255,0.88);  
+    --muted-sub:#cfd8dc;  
+    --accent:#00bcd4;  
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.45);  
+  
+    --bg-light:#f6f7f9;  
+    --panel-light:#ffffff;  
+    --muted-light:#111827;  
+    --card-shadow-light:0 8px 24px rgba(0,0,0,0.06);  
+  }  
+  
+  html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Arial, sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}  
+  body{background:var(--bg-dark);color:var(--muted-dark);transition:background .25s,color .25s}  
+  body.light{background:var(--bg-light);color:var(--muted-light)}  
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--panel-dark);box-shadow:var(--card-shadow)}  
+  body.light header{background:var(--panel-light);box-shadow:var(--card-shadow-light)}  
+  h1{margin:0;color:var(--accent);font-size:18px;display:flex;align-items:center;gap:8px}  
+  
+  .controls-row{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;gap:12px;flex-wrap:wrap}  
+  .controls-left, .controls-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}  
+  .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px}  
+  .btn.ghost{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:6px 10px}  
+  input[type=file]{display:none}  
+  
+  .indicator{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:transparent;border:2px solid transparent;font-weight:700}  
+  .indicator .icon{font-size:18px}  
+  
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:18px;max-width:1200px;margin:0 auto}  
+  .gallery.list{display:flex;flex-direction:column;padding:10px 18px}  
+  
+  .card{  
+    background:var(--panel-dark);  
+    border-radius:12px;  
+    overflow:hidden;  
+    box-shadow:var(--card-shadow);  
+    transition:transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease, opacity .25s;  
+    display:flex;  
+    flex-direction:column;  
+    will-change:transform,box-shadow;  
+    cursor:pointer;  
+  }  
+  body.light .card{background:var(--panel-light);box-shadow:var(--card-shadow-light)}  
+  .card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}  
+  .card.touch-active{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}  
+  .card.row{flex-direction:row;align-items:center;padding:8px;height:110px}  
+  
+  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:12px;background:#000;display:flex;align-items:center;justify-content:center}  
+  .thumb{width:100%;height:100%;object-fit:cover;display:block;background:#000}  
+  .thumb-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;background:#000}  
+  .duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}  
+  
+  .progress-small{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.06)}  
+  .progress-small .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ff5a5a)}  
+  
+  .meta{padding:10px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}  
+  .meta h3{  
+    margin:0;  
+    font-size:15px;  
+    color:var(--muted-dark);  
+    white-space:normal;  
+    overflow-wrap:break-word;  
+    word-break:break-word;  
+    hyphens:auto;  
+    line-height:1.15;  
+    margin-right:8px;  
+    display:block;  
+  }  
+  body.light .meta h3{color:var(--muted-light)}  
+  .meta .tags{display:flex;gap:8px;flex-wrap:wrap}  
+  .tag{background:rgba(0,0,0,0.35);color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}  
+  body.light .tag{background:rgba(0,0,0,0.06);color:var(--muted-light)}  
+  .detail-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted-dark)}  
+  body.light .detail-row{color:var(--muted-light)}  
+  
+  #player-container{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:18px}  
+  #player-box{width:100%;max-width:1100px;max-height:calc(100vh - 140px);display:flex;flex-direction:column;align-items:center;gap:12px}  
+  #player{width:100%;height:auto;background:#000;border-radius:8px;outline:none;max-height:calc(100vh - 220px);object-fit:contain}  
+  #audioPlayer{width:100%;display:none}  
+  #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}  
+  
+  @media (max-width:760px){  
+    .thumb-wrap{flex:0 0 120px;height:72px;margin:8px}  
+    .card.row{height:auto;padding:8px}  
+  }  
+  
+  .card{opacity:1}  
+  .fade-in{opacity:0;transform:translateY(6px);animation:fadeUp .45s forwards}  
+  @keyframes fadeUp{to{opacity:1;transform:none}}  
+  
+  .meta h3{max-height:5.4em}  
 
-  <style>
-    :root {
-      --bg-dark: #0b0f12;
-      --bg-light: #ffffff;
-      --text-dark: #ffffff;
-      --text-light: #000000;
-      --accent: #00b4ff;
-      --card-bg-dark: #1a1f25;
-      --card-bg-light: #f3f4f6;
-    }
+  /* Hover effect for video cards */
+  .card:hover .thumb-wrap video,
+  .card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 25px 55px rgba(0, 0, 0, 0.5);
+  }
+</style>  
+</head>  
+<body>  
+  <header>  
+    <h1>🎬 Rajes Media Player</h1>  
+    <div style="display:flex;gap:10px;align-items:center">  
+      <span id="themeIndicator" class="indicator" title="Theme"><span class="icon">🌙</span></span>  
+      <span id="viewIndicator" class="indicator" title="View"><span class="icon">🔲</span></span>  
+    </div>  
+  </header>  
+  <div class="controls-row">
+    <div class="controls-left">
+      <label class="btn" for="fileInput">📂 Select Files</label>
+      <input id="fileInput" type="file" accept="video/*,audio/*" multiple>
 
-    body {
-      font-family: "Segoe UI", sans-serif;
-      margin: 0;
-      background: var(--bg-light);
-      color: var(--text-light);
-      transition: background 0.3s, color 0.3s;
-    }
+      <label class="btn" for="folderInput">📁 Select Folder</label>
+      <input id="folderInput" type="file" accept="video/*,audio/*" webkitdirectory>
 
-    body.dark {
-      background: var(--bg-dark);
-      color: var(--text-dark);
-    }
+      <select id="typeFilter" class="btn ghost" title="Filter type">
+        <option value="all">All types</option>
+        <option value="video">Video</option>
+        <option value="audio">Audio</option>
+      </select>
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 25px;
-      font-size: 1.5em;
-      font-weight: 600;
-      color: var(--accent);
-    }
+      <select id="sortSelect" class="btn ghost" title="Sort">
+        <option value="type">Sort: Type</option>
+        <option value="title">Title</option>
+        <option value="date">Date</option>
+        <option value="length">Length</option>
+        <option value="size">Size</option>
+        <option value="resolution">Resolution</option>
+      </select>
+    </div>
 
-    header .icon {
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 10px 25px;
-      justify-content: center;
-    }
-
-    .controls button, .controls select {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .controls button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px var(--accent);
-    }
-
-    .media-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .media-card {
-      background: var(--card-bg-light);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-    }
-
-    body.dark .media-card {
-      background: var(--card-bg-dark);
-    }
-
-    /* Hover animation (lift + zoom + blue glow) */
-    .media-card:hover {
-      transform: translateY(-8px) scale(1.05);
-      box-shadow: 0 0 20px #00b4ff;
-    }
-
-    .thumb {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      display: block;
-      background: #000;
-    }
-
-    .media-info {
-      padding: 10px 14px;
-      line-height: 1.4;
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
-    }
-
-    .media-title {
-      font-size: 1em;
-      font-weight: 600;
-      margin: 4px 0;
-      word-break: break-word;
-      white-space: normal;
-    }
-
-    .media-meta {
-      font-size: 0.85em;
-      opacity: 0.8;
-    }
-
-    .tag {
-      display: inline-block;
-      background: #ccc;
-      border-radius: 6px;
-      padding: 2px 8px;
-      font-size: 0.8em;
-      margin-bottom: 4px;
-      font-weight: bold;
-    }
-
-    body.dark .tag {
-      background: #333;
-      color: #fff;
-    }
-
-    .emoji-thumb {
-      width: 100%;
-      height: 160px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      font-size: 50px;
-    }
-  </style>
-</head>
-
-<body class="light">
-  <header>
-    <div>🎬 Rajes Media Player</div>
-    <div class="icon" id="themeToggle">🌞</div>
-  </header>
-
-  <div class="controls">
-    <button id="selectFiles">📁 Select Files</button>
-    <button id="selectFolder">📂 Select Folder</button>
-    <select id="typeFilter">
-      <option value="all">All types</option>
-      <option value="video">Video</option>
-      <option value="audio">Audio</option>
-    </select>
-    <select id="sortType">
-      <option value="type">Sort: Type</option>
-      <option value="name">Sort: Name</option>
-      <option value="date">Sort: Date</option>
-    </select>
-    <button id="viewList">📋 List</button>
-    <button id="viewGrid">🔳 Grid</button>
+    <div class="controls-right">
+      <button id="viewToggle" class="btn ghost" title="Toggle grid/list">🔲 Grid</button>
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌙 Dark</button>
+    </div>
   </div>
 
-  <div class="media-container" id="mediaContainer"></div>
+  <main>
+    <div id="gallery" class="gallery"></div>
+  </main>
 
-  <script>
-    const themeToggle = document.getElementById("themeToggle");
-    const body = document.body;
-    const mediaContainer = document.getElementById("mediaContainer");
+  <!-- Player overlay -->
+  <div id="player-container" role="dialog" aria-hidden="true">
+    <div id="player-box">
+      <button id="close" title="Close">✖</button>
+      <video id="player" controls playsinline webkit-playsinline></video>
+      <audio id="audioPlayer" controls style="display:none"></audio>
+      <div id="player-meta" style="color:#fff;font-size:13px;width:100%;text-align:left"></div>
+    </div>
+  </div>
 
-    let darkMode = false;
-    let mediaFiles = [];
+  <footer style="padding:14px;text-align:center;color:rgba(255,255,255,0.45)">© 2025 Rajes Media Player — Local media only</footer>
 
-    themeToggle.onclick = () => {
-      darkMode = !darkMode;
-      body.classList.toggle("dark", darkMode);
-      themeToggle.textContent = darkMode ? "🌙" : "🌞";
-    };
+<script>
+/* ------------------ State ------------------ */
+const galleryEl = document.getElementById('gallery');
+const fileInput = document.getElementById('fileInput');
+const folderInput = document.getElementById('folderInput');
+const typeFilter = document.getElementById('typeFilter');
+const sortSelect = document.getElementById('sortSelect');
+const viewToggle = document.getElementById('viewToggle');
+const themeToggle = document.getElementById('themeToggle');
+const viewIndicator = document.getElementById('viewIndicator');
+const themeIndicator = document.getElementById('themeIndicator');
 
-    document.getElementById("selectFiles").addEventListener("click", async () => {
-      const [fileHandle] = await window.showOpenFilePicker({ multiple: true });
-    });
+const playerContainer = document.getElementById('player-container');
+const player = document.getElementById('player');
+const audioPlayer = document.getElementById('audioPlayer');
+const closeBtn = document.getElementById('close');
+const playerMeta = document.getElementById('player-meta');
 
-    // Example items (demo)
-    const exampleItems = [
-      { type: "audio", name: "Song1.mp3", length: "3:11", size: "7 MB" },
-      { type: "video", name: "Clip1.mp4", length: "0:14", size: "3 MB" },
-      { type: "audio", name: "Track_LoFi.mp3", length: "2:45", size: "6 MB" }
-    ];
+let allFiles = []; // {file, url, metadata:{duration,width,height,fps,size,date}, thumbUrl, played}
+let isListView = false;
+let isLight = false;
 
-    function buildCard(item) {
-      const card = document.createElement("div");
-      card.className = "media-card";
+/* ------------------ Helpers ------------------ */
+function formatBytes(bytes){
+  if(bytes===0) return '0 B';
+  const k=1024, sizes=['B','KB','MB','GB','TB'];
+  const i=Math.floor(Math.log(bytes)/Math.log(k));
+  return parseFloat((bytes/Math.pow(k,i)).toFixed(2))+' '+sizes[i];
+}
+function formatTime(s){
+  s = Number(s) || 0;
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.floor(s%60);
+  if(h>0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  return `${m}:${String(sec).padStart(2,'0')}`;
+}
 
-      if (item.type === "audio") {
-        const emojiDiv = document.createElement("div");
-        emojiDiv.className = "emoji-thumb";
-        emojiDiv.textContent = "🎵";
-        card.appendChild(emojiDiv);
-      } else {
-        const img = document.createElement("img");
-        img.className = "thumb";
-        img.src = item.thumbUrl || "https://via.placeholder.com/320x160?text=Video";
-        card.appendChild(img);
-      }
+/* ----------- Thumbnail capture at 1/4 duration ----------- */
+async function captureThumbnail(url){
+  return new Promise((resolve)=>{
+    const v = document.createElement('video');
+    v.crossOrigin = 'anonymous';
+    v.muted = true;
+    v.preload = 'metadata';
+    v.src = url;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    let done=false;
+    function cleanup(){ try{ v.src=''; v.load(); }catch(e){} }
+    v.addEventListener('loadedmetadata', ()=>{
+      const t = Math.max(0.1, (v.duration || 0) * 0.25);
+      canvas.width = Math.min(640, v.videoWidth || 640);
+      canvas.height = Math.round(canvas.width * ((v.videoHeight||360)/(v.videoWidth||640)));
+      v.currentTime = Math.min(t, v.duration || t);
+      v.addEventListener('seeked', ()=>{
+        try{
+          ctx.drawImage(v,0,0,canvas.width,canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg',0.75);
+          if(!done){ done=true; cleanup(); resolve({thumb:dataUrl,width:v.videoWidth,height:v.videoHeight}); }
+        }catch(e){
+          if(!done){ done=true; cleanup(); resolve({thumb:null,width:v.videoWidth,height:v.videoHeight}); }
+        }
+      }, {once:true});
+      // fallback timeout
+      setTimeout(()=>{ if(!done){ try{ ctx.drawImage(v,0,0,canvas.width,canvas.height); }catch(_){} done=true; cleanup(); resolve({thumb:canvas.toDataURL('image/jpeg',0.7), width:v.videoWidth, height:v.videoHeight}); } }, 900);
+    }, {once:true});
+    v.addEventListener('error', ()=>{ if(!done){ done=true; cleanup(); resolve({thumb:null,width:0,height:0}); } }, {once:true});
+  });
+}
 
-      const info = document.createElement("div");
-      info.className = "media-info";
+/* ---------- Estimate FPS (best-effort) ---------- */
+async function estimateFPS(url, duration){
+  return new Promise((resolve)=>{
+    try{
+      const v = document.createElement('video'); v.preload='metadata'; v.muted=true; v.src=url;
+      v.addEventListener('loadedmetadata', ()=>{
+        const finish = ()=>{
+          try{
+            if(typeof v.getVideoPlaybackQuality === 'function'){
+              const q = v.getVideoPlaybackQuality();
+              if(q && q.totalVideoFrames && duration > 0){
+                resolve(Math.round(q.totalVideoFrames / Math.max(1,duration)));
+                v.src='';
+                return;
+              }
+            }
+            const frames = v.webkitDecodedFrameCount || v.mozPaintCount || 0;
+            if(frames && duration > 0){
+              resolve(Math.round(frames/duration));
+              v.src=''; return;
+            }
+            resolve('Unknown');
+            v.src='';
+          }catch(e){ resolve('Unknown'); v.src=''; }
+        };
+        v.play().then(()=>{ setTimeout(()=>{ v.pause(); finish(); }, 300); }).catch(()=>{ finish(); });
+      }, {once:true});
+      v.addEventListener('error', ()=>resolve('Unknown'), {once:true});
+    }catch(e){ resolve('Unknown'); }
+  });
+}
 
-      const tag = document.createElement("div");
-      tag.className = "tag";
-      tag.textContent = item.type.toUpperCase();
-      info.appendChild(tag);
+/* ---------------- Build card ---------------- */
+function buildCard(item, idx){
+  const isVideo = item.file.type.startsWith('video/');
+  const card = document.createElement('div');
+  card.className = 'card fade-in';
+  if(isListView) card.classList.add('row');
 
-      const title = document.createElement("div");
-      title.className = "media-title";
-      title.textContent = item.name;
-      info.appendChild(title);
+  const thumbWrap = document.createElement('div'); thumbWrap.className='thumb-wrap';
 
-      const meta = document.createElement("div");
-      meta.className = "media-meta";
-      meta.innerHTML = `Length: ${item.length} | Size: ${item.size}`;
-      info.appendChild(meta);
-
-      card.appendChild(info);
-      mediaContainer.appendChild(card);
+  // Create thumbnail: if we have an image url, use <img>.
+  // If not, and it's an audio file, show emoji DIV. If not and no thumb, show empty img (black).
+  if(item.thumbUrl){
+    const img = document.createElement('img');
+    img.className='thumb';
+    img.alt = item.file.name;
+    img.src = item.thumbUrl;
+    thumbWrap.appendChild(img);
+  } else {
+    if(item.file.type.startsWith('audio/')){
+      const emojiDiv = document.createElement('div');
+      emojiDiv.className = 'thumb-emoji';
+      emojiDiv.textContent = '🎵';
+      thumbWrap.appendChild(emojiDiv);
+    } else {
+      const img = document.createElement('img');
+      img.className='thumb';
+      img.alt = item.file.name;
+      img.src = ''; // blank -> CSS black background
+      thumbWrap.appendChild(img);
     }
+  }
 
-    exampleItems.forEach(buildCard);
-  </script>
+  const durBadge = document.createElement('div'); durBadge.className='duration-badge';
+  durBadge.textContent = item.metadata.duration ? formatTime(item.metadata.duration) : '00:00';
+  thumbWrap.appendChild(durBadge);
+
+  const progressSmall = document.createElement('div'); progressSmall.className='progress-small';
+  const bar = document.createElement('div'); bar.className='bar';
+  bar.style.width = ( (item.played && item.metadata.duration) ? Math.min(100, (item.played / item.metadata.duration)*100) : 0 ) + '%';
+  progressSmall.appendChild(bar);
+  thumbWrap.appendChild(progressSmall);
+
+  const meta = document.createElement('div'); meta.className='meta';
+  const title = document.createElement('h3'); title.textContent = item.file.name;
+  const tagRow = document.createElement('div'); tagRow.className='tags';
+  const tagType = document.createElement('span'); tagType.className='tag'; tagType.textContent = item.file.type.split('/')[0].toUpperCase();
+  tagRow.appendChild(tagType);
+
+  const details = document.createElement('div'); details.className='detail-row';
+  const lengthEl = document.createElement('div'); lengthEl.textContent = 'Length: ' + (item.metadata.duration? formatTime(item.metadata.duration) : 'Unknown');
+  const resEl = document.createElement('div'); resEl.textContent = 'Res: ' + (item.metadata.width? `${item.metadata.width}x${item.metadata.height}` : 'Unknown');
+  const fpsEl = document.createElement('div'); fpsEl.textContent = 'FPS: ' + (item.metadata.fps || 'Unknown');
+  const sizeEl = document.createElement('div'); sizeEl.textContent = 'Size: ' + (item.file.size ? formatBytes(item.file.size) : 'Unknown');
+  const dateEl = document.createElement('div'); dateEl.textContent = 'Date: ' + new Date(item.file.lastModified).toLocaleDateString();
+  const playedEl = document.createElement('div'); playedEl.textContent = 'Played: ' + (item.played ? formatTime(item.played) : '0:00');
+
+  details.append(lengthEl,resEl,fpsEl,sizeEl,dateEl,playedEl);
+  meta.append(title, tagRow, details);
+
+  // click to open in overlay player
+  const openPlayer = (e)=>{
+    e.stopPropagation();
+    openInPlayer(idx);
+  };
+
+  // pointer/touch visual feedback: add touch-active class on pointerdown and remove on pointerup/cancel
+  const addTouchActive = (ev)=>{
+    card.classList.add('touch-active');
+  };
+  const removeTouchActive = (ev)=>{
+    card.classList.remove('touch-active');
+  };
+
+  card.addEventListener('pointerdown', addTouchActive, {passive:true});
+  card.addEventListener('pointerup', removeTouchActive, {passive:true});
+  card.addEventListener('pointercancel', removeTouchActive, {passive:true});
+  card.addEventListener('pointerleave', removeTouchActive, {passive:true});
+
+  thumbWrap.addEventListener('click', openPlayer);
+  meta.addEventListener('click', openPlayer);
+
+  card.appendChild(thumbWrap);
+  card.appendChild(meta);
+  return card;
+}
+
+/* ---------------- Render gallery ---------------- */
+function renderGallery(){
+  galleryEl.innerHTML = '';
+  const filter = typeFilter.value;
+  let filesToShow = allFiles.filter(it => (filter==='all' ? true : it.file.type.startsWith(filter)));
+  const sortBy = sortSelect.value;
+
+  filesToShow.sort((a,b)=>{
+    if(sortBy==='title') return a.file.name.localeCompare(b.file.name);
+    if(sortBy==='type') return a.file.type.localeCompare(b.file.type);
+    if(sortBy==='date') return a.file.lastModified - b.file.lastModified;
+    if(sortBy==='size') return a.file.size - b.file.size;
+    if(sortBy==='length') return (a.metadata.duration || 0) - (b.metadata.duration || 0);
+    if(sortBy==='resolution'){
+      const ra = (a.metadata.width||0)*(a.metadata.height||0);
+      const rb = (b.metadata.width||0)*(b.metadata.height||0);
+      return rb - ra;
+    }
+    return 0;
+  });
+
+  galleryEl.classList.toggle('list', isListView);
+  filesToShow.forEach((it, idx)=>{
+    const card = buildCard(it, allFiles.indexOf(it));
+    galleryEl.appendChild(card);
+  });
+}
+
+/* ---------------- Open in native player overlay ---------------- */
+function openInPlayer(index){
+  const item = allFiles[index];
+  if(!item) return;
+  const isVideo = item.file.type.startsWith('video/');
+  playerContainer.style.display = 'flex';
+  playerContainer.setAttribute('aria-hidden','false');
+
+  try{ player.pause(); audioPlayer.pause(); } catch(e){}
+
+  if(isVideo){
+    audioPlayer.style.display = 'none';
+    player.style.display = 'block';
+    player.src = item.url;
+    player.currentTime = item.played || 0;
+    playerMeta.textContent = `${item.file.name} • ${item.metadata.width ? item.metadata.width + 'x' + item.metadata.height : 'Res unknown'} • ${item.file.size? formatBytes(item.file.size) : ''}`;
+    player.play().catch(()=>{});
+    player.ontimeupdate = ()=>{ item.played = player.currentTime; renderGallery(); };
+  } else {
+    player.style.display = 'none';
+    audioPlayer.style.display = 'block';
+    audioPlayer.src = item.url;
+    audioPlayer.currentTime = item.played || 0;
+    playerMeta.textContent = `${item.file.name} • Audio • ${item.file.size? formatBytes(item.file.size) : ''}`;
+    audioPlayer.play().catch(()=>{});
+    audioPlayer.ontimeupdate = ()=>{ item.played = audioPlayer.currentTime; renderGallery(); };
+  }
+}
+
+/* ---------------- Ingest files ---------------- */
+async function ingestFiles(fileList){
+  for(const f of fileList){
+    if(!f.type || (!f.type.startsWith('video/') && !f.type.startsWith('audio/'))) continue;
+    const url = URL.createObjectURL(f);
+    const entry = {file: f, url: url, metadata:{}, thumbUrl:null, played:0};
+    entry.metadata.size = f.size;
+    entry.metadata.date = f.lastModified;
+
+    if(f.type.startsWith('video/')){
+      try{
+        const {thumb,width,height} = await captureThumbnail(url);
+        entry.thumbUrl = thumb;
+        entry.metadata.width = width;
+        entry.metadata.height = height;
+      }catch(e){ entry.thumbUrl = null; }
+      // load duration via temporary element
+      const v = document.createElement('video'); v.preload='metadata'; v.muted=true; v.src=url;
+      await new Promise((res)=>{ v.addEventListener('loadedmetadata', ()=>res(), {once:true}); v.addEventListener('error', ()=>res(), {once:true}); });
+      entry.metadata.duration = v.duration || 0;
+      entry.metadata.fps = await estimateFPS(url, entry.metadata.duration);
+    } else {
+      const a = document.createElement('audio'); a.preload='metadata'; a.src = url;
+      await new Promise((res)=>{ a.addEventListener('loadedmetadata', ()=>res(), {once:true}); a.addEventListener('error', ()=>res(), {once:true}); });
+      entry.metadata.duration = a.duration || 0;
+      // audio thumbnail default will be handled when rendering (emoji)
+      entry.thumbUrl = null;
+    }
+    allFiles.push(entry);
+    // small render update for best UX
+    renderGallery();
+  }
+  renderGallery();
+}
+
+/* ---------------- Filtering / Sorting UI ---------------- */
+fileInput.addEventListener('change', async (e)=>{ const files = Array.from(e.target.files||[]); await ingestFiles(files); });
+folderInput.addEventListener('change', async (e)=>{ const files = Array.from(e.target.files||[]); await ingestFiles(files); });
+typeFilter.addEventListener('change', ()=>renderGallery());
+sortSelect.addEventListener('change', ()=>renderGallery());
+
+/* ---------------- View & Theme toggles ---------------- */
+viewToggle.addEventListener('click', ()=>{
+  isListView = !isListView;
+  viewToggle.textContent = isListView ? '📋 List' : '🔲 Grid';
+  viewIndicator.querySelector('.icon').textContent = isListView ? '📋' : '🔲';
+  renderGallery();
+});
+themeToggle.addEventListener('click', ()=>{
+  isLight = !isLight;
+  document.body.classList.toggle('light', isLight);
+  themeToggle.textContent = isLight ? '☀️ Light' : '🌙 Dark';
+  themeIndicator.querySelector('.icon').textContent = isLight ? '☀️' : '🌙';
+});
+
+/* ---------------- Player close ---------------- */
+closeBtn.addEventListener('click', ()=>{
+  try{ player.pause(); audioPlayer.pause(); }catch(e){}
+  playerContainer.style.display = 'none';
+  playerContainer.setAttribute('aria-hidden','true');
+});
+
+/* track audio time updates to keep played time saved */
+audioPlayer.addEventListener('timeupdate', ()=>{
+  // find current playing file by src match
+  const cur = allFiles.find(it => it.url === audioPlayer.src || it.url === audioPlayer.currentSrc);
+  if(cur) cur.played = audioPlayer.currentTime;
+});
+
+/* ---------------- Cleanup before unload ---------------- */
+window.addEventListener('beforeunload', ()=>{
+  allFiles.forEach(it => { try{ URL.revokeObjectURL(it.url); }catch(e){} });
+});
+
+/* ---------------- Accessibility: Esc to close ---------------- */
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(playerContainer.style.display==='flex') closeBtn.click(); }});
+
+/* ---------------- Initialization ---------------- */
+(function init(){
+  viewToggle.textContent = '🔲 Grid';
+  themeToggle.textContent = '🌙 Dark';
+  themeIndicator.querySelector('.icon').textContent = '🌙';
+  viewIndicator.querySelector('.icon').textContent = '🔲';
+  renderGallery();
+})();
+</script>
 </body>
 </html>
