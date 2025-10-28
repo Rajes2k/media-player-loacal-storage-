@@ -18,6 +18,7 @@
     --muted-light:#111827;
     --card-shadow-light:0 8px 24px rgba(0,0,0,0.06);
   }
+
   /* Base */
   html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Arial, sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
   body{background:var(--bg-dark);color:var(--muted-dark);transition:background .25s,color .25s}
@@ -41,23 +42,46 @@
   .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:18px;max-width:1200px;margin:0 auto}
   .gallery.list{display:flex;flex-direction:column;padding:10px 18px}
 
-  .card{background:var(--panel-dark);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);transition:transform .18s ease,box-shadow .18s ease,opacity .25s;display:flex;flex-direction:column}
+  /* card layout & animation */
+  .card{
+    background:var(--panel-dark);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--card-shadow);
+    transition:transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease, opacity .25s;
+    display:flex;
+    flex-direction:column;
+    will-change:transform,box-shadow;
+    cursor:pointer;
+  }
   body.light .card{background:var(--panel-light);box-shadow:var(--card-shadow-light)}
-  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.35)}
+  .card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}
+  .card.touch-active{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}
   .card.row{flex-direction:row;align-items:center;padding:8px;height:110px}
 
   .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:12px;background:#000;display:flex;align-items:center;justify-content:center}
   .thumb{width:100%;height:100%;object-fit:cover;display:block;background:#000}
-  /* When the thumbnail is not an image (emoji div), ensure it fills */
   .thumb-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;background:#000}
   .duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}
 
   .progress-small{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.06)}
-  .progress-small .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ff5a5a)} /* red-ish gradient end */
+  .progress-small .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ff5a5a)}
 
-  .meta{padding:10px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1}
-  /* allow title to wrap and show fully - removed nowrap */
-  .meta h3{margin:0;font-size:15px;color:var(--muted-dark);word-wrap:break-word;white-space:normal;overflow:visible}
+  /* meta area: ensure it can shrink and wrap properly */
+  .meta{padding:10px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+  /* allow title to wrap and show fully - fix overflow issues */
+  .meta h3{
+    margin:0;
+    font-size:15px;
+    color:var(--muted-dark);
+    white-space:normal;
+    overflow-wrap:break-word;
+    word-break:break-word;
+    hyphens:auto;
+    line-height:1.15;
+    margin-right:8px; /* small gap so it doesn't touch edge */
+    display:block;
+  }
   body.light .meta h3{color:var(--muted-light)}
   .meta .tags{display:flex;gap:8px;flex-wrap:wrap}
   .tag{background:rgba(0,0,0,0.35);color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}
@@ -72,8 +96,6 @@
   #audioPlayer{width:100%;display:none}
   #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}
 
-  /* bottom audio bar removed intentionally */
-
   /* sticky bottom on small screens adjust */
   @media (max-width:760px){
     .thumb-wrap{flex:0 0 120px;height:72px;margin:8px}
@@ -85,8 +107,8 @@
   .fade-in{opacity:0;transform:translateY(6px);animation:fadeUp .45s forwards}
   @keyframes fadeUp{to{opacity:1;transform:none}}
 
-  /* small responsive tweak so long titles look good */
-  .meta h3{line-height:1.2;max-height:3.6em} /* show up to ~3 lines */
+  /* limit visible title lines for neatness on small cards (adjust as needed) */
+  .meta h3{max-height:5.4em} /* allow ~4-5 lines depending on font-size */
 </style>
 </head>
 <body>
@@ -309,6 +331,20 @@ function buildCard(item, idx){
     e.stopPropagation();
     openInPlayer(idx);
   };
+
+  // pointer/touch visual feedback: add touch-active class on pointerdown and remove on pointerup/cancel
+  const addTouchActive = (ev)=>{
+    card.classList.add('touch-active');
+  };
+  const removeTouchActive = (ev)=>{
+    card.classList.remove('touch-active');
+  };
+
+  card.addEventListener('pointerdown', addTouchActive, {passive:true});
+  card.addEventListener('pointerup', removeTouchActive, {passive:true});
+  card.addEventListener('pointercancel', removeTouchActive, {passive:true});
+  card.addEventListener('pointerleave', removeTouchActive, {passive:true});
+
   thumbWrap.addEventListener('click', openPlayer);
   meta.addEventListener('click', openPlayer);
 
