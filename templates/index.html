@@ -69,19 +69,6 @@
   #audioPlayer{width:100%;display:none}
   #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}
 
-  /* bottom audio bar (translucent glass) */
-  #audio-bar{position:fixed;left:12px;right:12px;bottom:12px;height:72px;border-radius:12px;display:flex;align-items:center;gap:12px;padding:10px 14px;z-index:10000;
-            background:rgba(255,255,255,0.06);backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,0.45);transition:transform .28s;transform:translateY(120%)}
-  body.light #audio-bar{background:rgba(255,255,255,0.6)}
-  #audio-bar.visible{transform:translateY(0%)}
-
-  #audio-thumb{width:52px;height:52px;border-radius:8px;background:#222;flex:0 0 52px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
-  #audio-title{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted-dark)}
-  .audio-controls{display:flex;align-items:center;gap:8px}
-  .ctrl{background:transparent;border:none;color:var(--muted-dark);font-size:20px;cursor:pointer;padding:8px;border-radius:8px}
-  .ctrl.active{color:var(--accent);background:rgba(255,255,255,0.04)}
-  .toggle{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted-dark);font-weight:700}
-
   /* sticky bottom on small screens adjust */
   @media (max-width:760px){
     #audio-bar{left:8px;right:8px;bottom:8px;height:64px}
@@ -149,19 +136,6 @@
     </div>
   </div>
 
-  <!-- Bottom audio bar (translucent) -->
-  <div id="audio-bar" aria-hidden="true">
-    <div id="audio-thumb">🎵</div>
-    <div id="audio-title">No track</div>
-    <div style="flex:0 0 220px;display:flex;align-items:center;gap:8px">
-      <button id="prevAudio" class="ctrl" title="Previous">⏮️</button>
-      <button id="playAudio" class="ctrl" title="Play/Pause">▶</button>
-      <button id="nextAudio" class="ctrl" title="Next">⏭️</button>
-      <button id="shuffleBtn" class="ctrl" title="Shuffle">🔀</button>
-      <button id="autoplayBtn" class="ctrl" title="Autoplay">🔁</button>
-    </div>
-  </div>
-
   <footer style="padding:14px;text-align:center;color:rgba(255,255,255,0.45)">© 2025 Rajes Media Player — Local media only</footer>
 
 <script>
@@ -185,11 +159,6 @@ const playerMeta = document.getElementById('player-meta');
 const audioBar = document.getElementById('audio-bar');
 const audioThumb = document.getElementById('audio-thumb');
 const audioTitle = document.getElementById('audio-title');
-const prevAudio = document.getElementById('prevAudio');
-const playAudio = document.getElementById('playAudio');
-const nextAudio = document.getElementById('nextAudio');
-const shuffleBtn = document.getElementById('shuffleBtn');
-const autoplayBtn = document.getElementById('autoplayBtn');
 
 let allFiles = []; // {file, url, metadata:{duration,width,height,fps,size,date}, thumbUrl, played}
 let isListView = false;
