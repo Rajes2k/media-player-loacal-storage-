@@ -46,15 +46,18 @@
   .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.35)}
   .card.row{flex-direction:row;align-items:center;padding:8px;height:110px}
 
-  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:12px;background:#000}
+  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:12px;background:#000;display:flex;align-items:center;justify-content:center}
   .thumb{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  /* When the thumbnail is not an image (emoji div), ensure it fills */
+  .thumb-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;background:#000}
   .duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}
 
   .progress-small{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.06)}
   .progress-small .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ff5a5a)} /* red-ish gradient end */
 
   .meta{padding:10px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1}
-  .meta h3{margin:0;font-size:15px;color:var(--muted-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* allow title to wrap and show fully - removed nowrap */
+  .meta h3{margin:0;font-size:15px;color:var(--muted-dark);word-wrap:break-word;white-space:normal;overflow:visible}
   body.light .meta h3{color:var(--muted-light)}
   .meta .tags{display:flex;gap:8px;flex-wrap:wrap}
   .tag{background:rgba(0,0,0,0.35);color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}
@@ -69,9 +72,10 @@
   #audioPlayer{width:100%;display:none}
   #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}
 
+  /* bottom audio bar removed intentionally */
+
   /* sticky bottom on small screens adjust */
   @media (max-width:760px){
-    #audio-bar{left:8px;right:8px;bottom:8px;height:64px}
     .thumb-wrap{flex:0 0 120px;height:72px;margin:8px}
     .card.row{height:auto;padding:8px}
   }
@@ -81,6 +85,8 @@
   .fade-in{opacity:0;transform:translateY(6px);animation:fadeUp .45s forwards}
   @keyframes fadeUp{to{opacity:1;transform:none}}
 
+  /* small responsive tweak so long titles look good */
+  .meta h3{line-height:1.2;max-height:3.6em} /* show up to ~3 lines */
 </style>
 </head>
 <body>
@@ -156,19 +162,9 @@ const audioPlayer = document.getElementById('audioPlayer');
 const closeBtn = document.getElementById('close');
 const playerMeta = document.getElementById('player-meta');
 
-const audioBar = document.getElementById('audio-bar');
-const audioThumb = document.getElementById('audio-thumb');
-const audioTitle = document.getElementById('audio-title');
-
 let allFiles = []; // {file, url, metadata:{duration,width,height,fps,size,date}, thumbUrl, played}
 let isListView = false;
 let isLight = false;
-
-/* audio playlist state */
-let audioList = []; // indices into allFiles for audio files
-let currentAudioIndex = -1;
-let isShuffle = false;
-let isAutoplay = false;
 
 /* ------------------ Helpers ------------------ */
 function formatBytes(bytes){
@@ -223,7 +219,6 @@ async function estimateFPS(url, duration){
     try{
       const v = document.createElement('video'); v.preload='metadata'; v.muted=true; v.src=url;
       v.addEventListener('loadedmetadata', ()=>{
-        // attempt to play briefly to get frames info
         const finish = ()=>{
           try{
             if(typeof v.getVideoPlaybackQuality === 'function'){
@@ -258,30 +253,29 @@ function buildCard(item, idx){
   if(isListView) card.classList.add('row');
 
   const thumbWrap = document.createElement('div'); thumbWrap.className='thumb-wrap';
-const img = document.createElement('img'); 
-img.className='thumb'; 
-img.alt = item.file.name;
 
-if(item.thumbUrl) {
-  img.src = item.thumbUrl;
-  thumbWrap.appendChild(img);
-} else {
-  if(item.file.type.startsWith('audio/')) {
-    // show audio emoji thumbnail for audio files
-    const emojiDiv = document.createElement('div');
-    emojiDiv.style.width = '100%';
-    emojiDiv.style.height = '100%';
-    emojiDiv.style.display = 'flex';
-    emojiDiv.style.alignItems = 'center';
-    emojiDiv.style.justifyContent = 'center';
-    emojiDiv.style.fontSize = '40px';
-    emojiDiv.textContent = '🎵';
-    thumbWrap.appendChild(emojiDiv);
-  } else {
-    img.src = ''; // blank for videos with no thumbnail
+  // Create thumbnail: if we have an image url, use <img>.
+  // If not, and it's an audio file, show emoji DIV. If not and no thumb, show empty img (black).
+  if(item.thumbUrl){
+    const img = document.createElement('img');
+    img.className='thumb';
+    img.alt = item.file.name;
+    img.src = item.thumbUrl;
     thumbWrap.appendChild(img);
+  } else {
+    if(item.file.type.startsWith('audio/')){
+      const emojiDiv = document.createElement('div');
+      emojiDiv.className = 'thumb-emoji';
+      emojiDiv.textContent = '🎵';
+      thumbWrap.appendChild(emojiDiv);
+    } else {
+      const img = document.createElement('img');
+      img.className='thumb';
+      img.alt = item.file.name;
+      img.src = ''; // blank -> CSS black background
+      thumbWrap.appendChild(img);
+    }
   }
-}
 
   const durBadge = document.createElement('div'); durBadge.className='duration-badge';
   durBadge.textContent = item.metadata.duration ? formatTime(item.metadata.duration) : '00:00';
@@ -310,7 +304,7 @@ if(item.thumbUrl) {
   details.append(lengthEl,resEl,fpsEl,sizeEl,dateEl,playedEl);
   meta.append(title, tagRow, details);
 
-  // click to open
+  // click to open in overlay player
   const openPlayer = (e)=>{
     e.stopPropagation();
     openInPlayer(idx);
@@ -346,7 +340,7 @@ function renderGallery(){
 
   galleryEl.classList.toggle('list', isListView);
   filesToShow.forEach((it, idx)=>{
-    const card = buildCard(it, idx);
+    const card = buildCard(it, allFiles.indexOf(it));
     galleryEl.appendChild(card);
   });
 }
@@ -356,11 +350,9 @@ function openInPlayer(index){
   const item = allFiles[index];
   if(!item) return;
   const isVideo = item.file.type.startsWith('video/');
-  // close audio bar if playing other audio? keep it independent
   playerContainer.style.display = 'flex';
   playerContainer.setAttribute('aria-hidden','false');
 
-  // cleanup previous
   try{ player.pause(); audioPlayer.pause(); } catch(e){}
 
   if(isVideo){
@@ -368,11 +360,9 @@ function openInPlayer(index){
     player.style.display = 'block';
     player.src = item.url;
     player.currentTime = item.played || 0;
-    // meta
     playerMeta.textContent = `${item.file.name} • ${item.metadata.width ? item.metadata.width + 'x' + item.metadata.height : 'Res unknown'} • ${item.file.size? formatBytes(item.file.size) : ''}`;
-    player.play().catch(()=>{}); // may require gesture
-    // track play progress for thumbnail progress bar
-    player.ontimeupdate = ()=>{ item.played = player.currentTime; updateSmallProgressFor(item); renderGallery(); };
+    player.play().catch(()=>{});
+    player.ontimeupdate = ()=>{ item.played = player.currentTime; renderGallery(); };
   } else {
     player.style.display = 'none';
     audioPlayer.style.display = 'block';
@@ -380,26 +370,8 @@ function openInPlayer(index){
     audioPlayer.currentTime = item.played || 0;
     playerMeta.textContent = `${item.file.name} • Audio • ${item.file.size? formatBytes(item.file.size) : ''}`;
     audioPlayer.play().catch(()=>{});
-    audioPlayer.ontimeupdate = ()=>{ item.played = audioPlayer.currentTime; renderGallery(); updateAudioBarUI(); };
-    // ensure audio bar shows
-    const audioIdx = allFiles.indexOf(item);
-    if(audioIdx>=0){
-      const pos = audioList.indexOf(audioIdx);
-      if(pos>=0) currentAudioIndex = pos;
-      else {
-        // if audio not in playlist yet, rebuild playlist and set current
-        rebuildAudioList();
-        currentAudioIndex = audioList.indexOf(allFiles.indexOf(item));
-      }
-      showAudioBar();
-    }
+    audioPlayer.ontimeupdate = ()=>{ item.played = audioPlayer.currentTime; renderGallery(); };
   }
-}
-
-/* update small progress bar for a single item (thumbnail) */
-function updateSmallProgressFor(item){
-  // find corresponding card and update its small bar if present
-  // simpler approach: re-render gallery (already done elsewhere)
 }
 
 /* ---------------- Ingest files ---------------- */
@@ -427,15 +399,13 @@ async function ingestFiles(fileList){
       const a = document.createElement('audio'); a.preload='metadata'; a.src = url;
       await new Promise((res)=>{ a.addEventListener('loadedmetadata', ()=>res(), {once:true}); a.addEventListener('error', ()=>res(), {once:true}); });
       entry.metadata.duration = a.duration || 0;
-      // audio thumbnail default will be icon
+      // audio thumbnail default will be handled when rendering (emoji)
       entry.thumbUrl = null;
     }
     allFiles.push(entry);
     // small render update for best UX
     renderGallery();
   }
-  // rebuild audio list
-  rebuildAudioList();
   renderGallery();
 }
 
@@ -466,19 +436,12 @@ closeBtn.addEventListener('click', ()=>{
   playerContainer.setAttribute('aria-hidden','true');
 });
 
-
 /* track audio time updates to keep played time saved */
 audioPlayer.addEventListener('timeupdate', ()=>{
-  const curItem = allFiles[audioList[currentAudioIndex]];
-  if(curItem) curItem.played = audioPlayer.currentTime;
+  // find current playing file by src match
+  const cur = allFiles.find(it => it.url === audioPlayer.src || it.url === audioPlayer.currentSrc);
+  if(cur) cur.played = audioPlayer.currentTime;
 });
-
-/* ---------------- Fixes & behaviors ---------------- */
-/* Ensure thumbnail durations show correct lengths by using metadata; progress bar uses item.played */
-function refreshSmallBars(){
-  // re-render gallery (cheap)
-  renderGallery();
-}
 
 /* ---------------- Cleanup before unload ---------------- */
 window.addEventListener('beforeunload', ()=>{
@@ -494,9 +457,8 @@ document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(playerConta
   themeToggle.textContent = '🌙 Dark';
   themeIndicator.querySelector('.icon').textContent = '🌙';
   viewIndicator.querySelector('.icon').textContent = '🔲';
-  rebuildAudioList();
+  renderGallery();
 })();
-
 </script>
 </body>
 </html>
