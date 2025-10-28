@@ -439,7 +439,31 @@ async function ingestFiles(fileList){
       await new Promise((res)=>{ a.addEventListener('loadedmetadata', ()=>res(), {once:true}); a.addEventListener('error', ()=>res(), {once:true}); });
       entry.metadata.duration = a.duration || 0;
       // audio thumbnail default will be icon
-      entry.thumbUrl = null;
+      if (file.type === "video") {
+  thumbSrc = await captureThumbnail(file.src);
+} else {
+  // ✅ Show default audio symbol for all audio files
+  thumbSrc = "https://img.icons8.com/emoji/96/musical-note-emoji.png";
+
+  // Fallback: if image fails to load, show a colored background with 🎵 symbol
+  const imgTest = new Image();
+  imgTest.src = thumbSrc;
+  imgTest.onerror = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 320;
+    canvas.height = 180;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "80px Arial";
+    ctx.fillStyle = "#1db954";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("🎵", canvas.width / 2, canvas.height / 2);
+    thumbSrc = canvas.toDataURL("image/png");
+  };
+}
+
     }
     allFiles.push(entry);
     // small render update for best UX
@@ -470,6 +494,12 @@ themeToggle.addEventListener('click', ()=>{
   themeIndicator.querySelector('.icon').textContent = isLight ? '☀️' : '🌙';
 });
 
+/* ---------------- Player close ---------------- */
+closeBtn.addEventListener('click', ()=>{
+  try{ player.pause(); audioPlayer.pause(); }catch(e){}
+  playerContainer.style.display = 'none';
+  playerContainer.setAttribute('aria-hidden','true');
+});
 
 
 /* track audio time updates to keep played time saved */
