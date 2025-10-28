@@ -1,120 +1,125 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-<meta charset="utf-8" />  
-<meta name="viewport" content="width=device-width,initial-scale=1" />  
-<title>Rajes Media Player</title>  
-<style>  
-  :root{  
-    --bg-dark:#0b0f12;  
-    --panel-dark:#14181b;  
-    --muted-dark:rgba(255,255,255,0.88);  
-    --muted-sub:#cfd8dc;  
-    --accent:#00bcd4;  
-    --card-shadow: 0 10px 30px rgba(0,0,0,0.45);  
-  
-    --bg-light:#f6f7f9;  
-    --panel-light:#ffffff;  
-    --muted-light:#111827;  
-    --card-shadow-light:0 8px 24px rgba(0,0,0,0.06);  
-  }  
-  
-  html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Arial, sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}  
-  body{background:var(--bg-dark);color:var(--muted-dark);transition:background .25s,color .25s}  
-  body.light{background:var(--bg-light);color:var(--muted-light)}  
-  header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--panel-dark);box-shadow:var(--card-shadow)}  
-  body.light header{background:var(--panel-light);box-shadow:var(--card-shadow-light)}  
-  h1{margin:0;color:var(--accent);font-size:18px;display:flex;align-items:center;gap:8px}  
-  
-  .controls-row{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;gap:12px;flex-wrap:wrap}  
-  .controls-left, .controls-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}  
-  .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px}  
-  .btn.ghost{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:6px 10px}  
-  input[type=file]{display:none}  
-  
-  .indicator{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:transparent;border:2px solid transparent;font-weight:700}  
-  .indicator .icon{font-size:18px}  
-  
-  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:18px;max-width:1200px;margin:0 auto}  
-  .gallery.list{display:flex;flex-direction:column;padding:10px 18px}  
-  
-  .card{  
-    background:var(--panel-dark);  
-    border-radius:12px;  
-    overflow:hidden;  
-    box-shadow:var(--card-shadow);  
-    transition:transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease, opacity .25s;  
-    display:flex;  
-    flex-direction:column;  
-    will-change:transform,box-shadow;  
-    cursor:pointer;  
-  }  
-  body.light .card{background:var(--panel-light);box-shadow:var(--card-shadow-light)}  
-  .card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}  
-  .card.touch-active{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}  
-  .card.row{flex-direction:row;align-items:center;padding:8px;height:110px}  
-  
-  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:12px;background:#000;display:flex;align-items:center;justify-content:center}  
-  .thumb{width:100%;height:100%;object-fit:cover;display:block;background:#000}  
-  .thumb-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;background:#000}  
-  .duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}  
-  
-  .progress-small{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.06)}  
-  .progress-small .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ff5a5a)}  
-  
-  .meta{padding:10px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}  
-  .meta h3{  
-    margin:0;  
-    font-size:15px;  
-    color:var(--muted-dark);  
-    white-space:normal;  
-    overflow-wrap:break-word;  
-    word-break:break-word;  
-    hyphens:auto;  
-    line-height:1.15;  
-    margin-right:8px;  
-    display:block;  
-  }  
-  body.light .meta h3{color:var(--muted-light)}  
-  .meta .tags{display:flex;gap:8px;flex-wrap:wrap}  
-  .tag{background:rgba(0,0,0,0.35);color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}  
-  body.light .tag{background:rgba(0,0,0,0.06);color:var(--muted-light)}  
-  .detail-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted-dark)}  
-  body.light .detail-row{color:var(--muted-light)}  
-  
-  #player-container{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:18px}  
-  #player-box{width:100%;max-width:1100px;max-height:calc(100vh - 140px);display:flex;flex-direction:column;align-items:center;gap:12px}  
-  #player{width:100%;height:auto;background:#000;border-radius:8px;outline:none;max-height:calc(100vh - 220px);object-fit:contain}  
-  #audioPlayer{width:100%;display:none}  
-  #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}  
-  
-  @media (max-width:760px){  
-    .thumb-wrap{flex:0 0 120px;height:72px;margin:8px}  
-    .card.row{height:auto;padding:8px}  
-  }  
-  
-  .card{opacity:1}  
-  .fade-in{opacity:0;transform:translateY(6px);animation:fadeUp .45s forwards}  
-  @keyframes fadeUp{to{opacity:1;transform:none}}  
-  
-  .meta h3{max-height:5.4em}  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rajes Media Player</title>
+<style>
+  :root{
+    --bg-dark:#0b0f12;
+    --panel-dark:#14181b;
+    --muted-dark:rgba(255,255,255,0.88);
+    --muted-sub:#cfd8dc;
+    --accent:#00bcd4;
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.45);
 
-  /* Hover effect for video cards */
-  .card:hover .thumb-wrap video,
-  .card:hover {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 25px 55px rgba(0, 0, 0, 0.5);
+    --bg-light:#f6f7f9;
+    --panel-light:#ffffff;
+    --muted-light:#111827;
+    --card-shadow-light:0 8px 24px rgba(0,0,0,0.06);
   }
-</style>  
-</head>  
-<body>  
-  <header>  
-    <h1>🎬 Rajes Media Player</h1>  
-    <div style="display:flex;gap:10px;align-items:center">  
-      <span id="themeIndicator" class="indicator" title="Theme"><span class="icon">🌙</span></span>  
-      <span id="viewIndicator" class="indicator" title="View"><span class="icon">🔲</span></span>  
-    </div>  
-  </header>  
+
+  /* Base */
+  html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Arial, sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  body{background:var(--bg-dark);color:var(--muted-dark);transition:background .25s,color .25s}
+  body.light{background:var(--bg-light);color:var(--muted-light)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--panel-dark);box-shadow:var(--card-shadow)}
+  body.light header{background:var(--panel-light);box-shadow:var(--card-shadow-light)}
+  h1{margin:0;color:var(--accent);font-size:18px;display:flex;align-items:center;gap:8px}
+
+  /* Controls row */
+  .controls-row{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;gap:12px;flex-wrap:wrap}
+  .controls-left, .controls-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+  .btn.ghost{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:6px 10px}
+  input[type=file]{display:none}
+
+  /* Indicators */
+  .indicator{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:transparent;border:2px solid transparent;font-weight:700}
+  .indicator .icon{font-size:18px}
+
+  /* gallery */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:18px;max-width:1200px;margin:0 auto}
+  .gallery.list{display:flex;flex-direction:column;padding:10px 18px}
+
+  /* card layout & animation */
+  .card{
+    background:var(--panel-dark);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--card-shadow);
+    transition:transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease, opacity .25s;
+    display:flex;
+    flex-direction:column;
+    will-change:transform,box-shadow;
+    cursor:pointer;
+  }
+  body.light .card{background:var(--panel-light);box-shadow:var(--card-shadow-light)}
+  .card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}
+  .card.touch-active{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 48px rgba(0,0,0,0.35)}
+  .card.row{flex-direction:row;align-items:center;padding:8px;height:110px}
+
+  .thumb-wrap{position:relative;flex:0 0 160px;height:90px;overflow:hidden;border-radius:10px;margin:12px;background:#000;display:flex;align-items:center;justify-content:center}
+  .thumb{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  .thumb-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;background:#000}
+  .duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}
+
+  .progress-small{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,0.06)}
+  .progress-small .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ff5a5a)}
+
+  /* meta area: ensure it can shrink and wrap properly */
+  .meta{padding:10px;text-align:left;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+  /* allow title to wrap and show fully - fix overflow issues */
+  .meta h3{
+    margin:0;
+    font-size:15px;
+    color:var(--muted-dark);
+    white-space:normal;
+    overflow-wrap:break-word;
+    word-break:break-word;
+    hyphens:auto;
+    line-height:1.15;
+    margin-right:8px; /* small gap so it doesn't touch edge */
+    display:block;
+  }
+  body.light .meta h3{color:var(--muted-light)}
+  .meta .tags{display:flex;gap:8px;flex-wrap:wrap}
+  .tag{background:rgba(0,0,0,0.35);color:#fff;padding:6px 8px;border-radius:6px;font-weight:700;font-size:12px}
+  body.light .tag{background:rgba(0,0,0,0.06);color:var(--muted-light)}
+  .detail-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted-dark)}
+  body.light .detail-row{color:var(--muted-light)}
+
+  /* player overlay */
+  #player-container{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:18px}
+  #player-box{width:100%;max-width:1100px;max-height:calc(100vh - 140px);display:flex;flex-direction:column;align-items:center;gap:12px}
+  #player{width:100%;height:auto;background:#000;border-radius:8px;outline:none;max-height:calc(100vh - 220px);object-fit:contain}
+  #audioPlayer{width:100%;display:none}
+  #close{position:absolute;right:18px;top:12px;font-size:22px;color:#fff;background:transparent;border:none;cursor:pointer}
+
+  /* sticky bottom on small screens adjust */
+  @media (max-width:760px){
+    .thumb-wrap{flex:0 0 120px;height:72px;margin:8px}
+    .card.row{height:auto;padding:8px}
+  }
+
+  /* subtle fade-in */
+  .card{opacity:1}
+  .fade-in{opacity:0;transform:translateY(6px);animation:fadeUp .45s forwards}
+  @keyframes fadeUp{to{opacity:1;transform:none}}
+
+  /* limit visible title lines for neatness on small cards (adjust as needed) */
+  .meta h3{max-height:5.4em} /* allow ~4-5 lines depending on font-size */
+</style>
+</head>
+<body>
+  <header>
+    <h1>🎬 Rajes Media Player</h1>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span id="themeIndicator" class="indicator" title="Theme"><span class="icon">🌙</span></span>
+      <span id="viewIndicator" class="indicator" title="View"><span class="icon">🔲</span></span>
+    </div>
+  </header>
+
   <div class="controls-row">
     <div class="controls-left">
       <label class="btn" for="fileInput">📂 Select Files</label>
@@ -130,7 +135,7 @@
       </select>
 
       <select id="sortSelect" class="btn ghost" title="Sort">
-        <option value="type">Sort: Type</option>
+        <option value="type">Type</option>
         <option value="title">Title</option>
         <option value="date">Date</option>
         <option value="length">Length</option>
@@ -162,20 +167,6 @@
   <footer style="padding:14px;text-align:center;color:rgba(255,255,255,0.45)">© 2025 Rajes Media Player — Local media only</footer>
 
 <script>
-/* --- SAME JS, NO DELETIONS (only added touch animation) --- */
-
-/* When touch/mouse pressed */
-document.addEventListener("pointerdown", e=>{
-  let card = e.target.closest(".card");
-  if(card) card.classList.add("touch-active");
-});
-document.addEventListener("pointerup", e=>{
-  document.querySelectorAll(".touch-active").forEach(c=>c.classList.remove("touch-active"));
-});
-document.addEventListener("pointerleave", e=>{
-  document.querySelectorAll(".touch-active").forEach(c=>c.classList.remove("touch-active"));
-});
-
 /* ------------------ State ------------------ */
 const galleryEl = document.getElementById('gallery');
 const fileInput = document.getElementById('fileInput');
