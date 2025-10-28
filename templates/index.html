@@ -470,12 +470,7 @@ themeToggle.addEventListener('click', ()=>{
   themeIndicator.querySelector('.icon').textContent = isLight ? '☀️' : '🌙';
 });
 
-/* ---------------- Player close ---------------- */
-closeBtn.addEventListener('click', ()=>{
-  try{ player.pause(); audioPlayer.pause(); }catch(e){}
-  playerContainer.style.display = 'none';
-  playerContainer.setAttribute('aria-hidden','true');
-});
+
 
 /* track audio time updates to keep played time saved */
 audioPlayer.addEventListener('timeupdate', ()=>{
