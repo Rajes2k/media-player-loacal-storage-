@@ -514,28 +514,6 @@ playAudio.addEventListener('click', ()=>{
   else { audioPlayer.pause(); playAudio.textContent = '▶'; }
 });
 
-prevAudio.addEventListener('click', ()=>{
-  if(audioList.length===0) return;
-  if(isShuffle) { currentAudioIndex = Math.floor(Math.random()*audioList.length); }
-  else { currentAudioIndex = (currentAudioIndex - 1 + audioList.length) % audioList.length; }
-  playAudioAtIndex(currentAudioIndex);
-});
-
-nextAudio.addEventListener('click', ()=>{
-  if(audioList.length===0) return;
-  if(isShuffle) { currentAudioIndex = Math.floor(Math.random()*audioList.length); }
-  else { currentAudioIndex = (currentAudioIndex + 1) % audioList.length; }
-  playAudioAtIndex(currentAudioIndex);
-});
-
-shuffleBtn.addEventListener('click', ()=>{
-  isShuffle = !isShuffle; shuffleBtn.classList.toggle('active', isShuffle);
-});
-
-autoplayBtn.addEventListener('click', ()=>{
-  isAutoplay = !isAutoplay; autoplayBtn.classList.toggle('active', isAutoplay);
-});
-
 /* play audio at playlist position */
 function playAudioAtIndex(playlistIndex){
   if(audioList.length===0) return;
